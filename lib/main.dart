@@ -4,9 +4,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:syncia/pages/home.dart';
 
 Future<void> main() async {
-  await dotenv.load(fileName: ".env").then(
-      (_) => OpenAI.apiKey = dotenv.env['API_KEY']!
-  );
+  await dotenv
+      .load(fileName: ".env")
+      .then((_) => OpenAI.apiKey = dotenv.env['API_KEY']!);
   runApp(const MyApp());
 }
 
@@ -16,12 +16,22 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      color: Colors.blue,
-      theme: ThemeData(useMaterial3: true,buttonTheme: const ButtonThemeData(buttonColor: Colors.blue,)),
+      theme: ThemeData(
+          useMaterial3: true,
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            textStyle: const TextStyle(color: Colors.white),
+            shape: ContinuousRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
+            backgroundColor: Colors.blue,
+          )
+        )
+      ),
       debugShowCheckedModeBanner: false,
       initialRoute: HomePage.id,
       routes: {
-        HomePage.id :(context) => const HomePage(),
+        HomePage.id: (context) => const HomePage(),
       },
     );
   }
