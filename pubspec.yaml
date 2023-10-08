@@ -41,11 +41,13 @@ dependencies:
   flutter_svg: ^2.0.7
   sembast: ^3.4.7
   sembast_sqflite: ^2.2.0
-  uuid: ^3.0.7
+  uuid: ^4.1.0
   permission_handler: ^10.3.0
   path_provider: ^2.0.15
   get: ^4.6.5
   flutter_dotenv: ^5.1.0
+  shared_preferences: ^2.2.1
+  dart_openai: ^4.0.0
 
 dev_dependencies:
   flutter_test:
