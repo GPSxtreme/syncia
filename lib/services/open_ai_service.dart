@@ -6,9 +6,13 @@ class OpenAiService{
   init() async {
     models = await OpenAI.instance.model.list();
   }
+
+  /// Returns the model with the given id
   Future<OpenAIModelModel> retrieveModel(String id)async{
     return await OpenAI.instance.model.retrieve(id);
   }
+
+  /// Returns the completion model with the given id
   Future<OpenAICompletionModel> getCompletion(String prompt,String model)async{
     return await OpenAI.instance.completion.create(
       model: model,
@@ -16,17 +20,44 @@ class OpenAiService{
       maxTokens: 20,
       temperature: 0.5,
       n: 1,
-      stop: ["\n"],
       echo: true,
-    )
+    );
   }
-  Future<Stream<OpenAICompletionModel>> streamCompletion(String prompt,String model)async{
+
+  /// Returns the stream completion model with the given id
+  Future<Stream<OpenAIStreamCompletionModel>> streamCompletion(String prompt,String model)async{
     return OpenAI.instance.completion.createStream(
       model: model,
       prompt: prompt,
       maxTokens: 100,
       temperature: 0.5,
       topP: 1,
+    );
+  }
+
+  /// Returns the chat completion model with the given id
+  Future<OpenAIChatCompletionModel> chatCompletion(String prompt,String model)async{
+    return await OpenAI.instance.chat.create(
+      model: model,
+      messages: [
+        OpenAIChatCompletionChoiceMessageModel(
+          content: prompt,
+          role: OpenAIChatMessageRole.user,
+        ),
+      ],
+    );
+  }
+
+  /// Returns the stream chat completion model with the given id
+  Future<Stream<OpenAIStreamChatCompletionModel>> streamChatCompletion(String prompt,String model)async{
+    return OpenAI.instance.chat.createStream(
+      model: model,
+      messages: [
+        OpenAIChatCompletionChoiceMessageModel(
+          content: prompt,
+          role: OpenAIChatMessageRole.user,
+        )
+      ]
     );
   }
 }
