@@ -15,13 +15,14 @@ class ChatMessage {
 
   factory ChatMessage.fromMap(Map<String, dynamic> map) {
     return ChatMessage(
-      id: map['id'] as String,
-      query: map['query'] as String,
-      response: map['response'] as String,
-      read: map['read'] as bool,
-      timestamp: DateTime.parse(map['timestamp'] as String),
+      id: map['id']?.toString() ?? '',
+      query: map['query']?.toString() ?? '',
+      response: map['response']?.toString() ?? '',
+      read: map['read'] is bool ? map['read'] : false,
+      timestamp: map['timestamp'] is String ? DateTime.parse(map['timestamp']) : DateTime.now(),
     );
   }
+
 
   Map<String, dynamic> toMap() {
     return {
