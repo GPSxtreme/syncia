@@ -1,4 +1,5 @@
 // ignore_for_file: constant_identifier_names, non_constant_identifier_names
+import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import '../models/chat_message.dart';
@@ -117,27 +118,61 @@ class ChatController extends GetxController {
     if (inputController.text.isEmpty) {
       return;
     }
+
     isSendingMessage.value = true;
     final question = inputController.text;
-    final response = await OpenAiService().chatCompletion(question.trim(), 'gpt-3.5-turbo');
-    ChatMessage message = ChatMessage(
-        id: response.id,
-        query: question.trim(),
-        response: response.choices[0].message.content.trim(),
-        timestamp: DateTime.now());
-    addMessage(message);
-    ChatMessage readMsg = ChatMessage(
-        id: response.id,
-        query: question.trim(),
-        response: response.choices[0].message.content.trim(),
-        timestamp: DateTime.now());
-    readMsg.setRead(true);
-    await databaseService.saveChatMessage(roomId, readMsg);
-    isSendingMessage.value = false;
-    inputController.clear();
-    // Scroll to the newly added query
-    scrollToBottom();
+
+    // Generating the chat history
+    var currentChatHistory = chatMessages.expand((message) => [
+      OpenAIChatCompletionChoiceMessageModel(
+        content: message.query,
+        role: OpenAIChatMessageRole.user,
+      ),
+      if (message.response.isNotEmpty)
+        OpenAIChatCompletionChoiceMessageModel(
+          content: message.response,
+          role: OpenAIChatMessageRole.system,
+        ),
+    ]).toList();
+
+    try {
+      // Assuming OpenAiService is a Singleton
+      final response = await OpenAiService().chatCompletion(question.trim(), 'gpt-3.5-turbo', currentChatHistory);
+
+      // Message for animation
+      ChatMessage animatedMessage = ChatMessage(
+          id: response.id,
+          query: question.trim(),
+          response: response.choices[0].message.content.trim(),
+          timestamp: DateTime.now(),
+          read: false
+      );
+
+      addMessage(animatedMessage);
+
+      // Message to store to database
+      ChatMessage storedMessage = ChatMessage(
+          id: response.id,
+          query: question.trim(),
+          response: response.choices[0].message.content.trim(),
+          timestamp: DateTime.now(),
+          read: true
+      );
+
+      await databaseService.saveChatMessage(roomId, storedMessage);
+
+      inputController.clear();
+
+      // Scroll to the newly added query
+      scrollToBottom();
+    } catch (error) {
+      Exception("Error sending chat message: $error");
+      // TODO: Maybe show a user-friendly error message using a dialog or a snackbar.
+    } finally {
+      isSendingMessage.value = false;
+    }
   }
+
 
   Future<void> scrollToBottom({bool addDelay = true}) async {
     // Wait for the animation to complete
