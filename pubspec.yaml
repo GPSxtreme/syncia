@@ -48,6 +48,10 @@ dependencies:
   flutter_dotenv: ^5.1.0
   shared_preferences: ^2.2.1
   dart_openai: ^4.0.0
+  google_fonts: ^6.1.0
+  intl: ^0.18.1
+  flutter_markdown: ^0.6.18
+  markdown: ^7.1.1
 
 dev_dependencies:
   flutter_test:
