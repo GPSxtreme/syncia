@@ -1,14 +1,12 @@
-// ignore_for_file: constant_identifier_names, non_constant_identifier_names
-import 'package:get/get.dart';
-import 'package:syncia/controllers/chat_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:syncia/widgets/query_tile.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:syncia/controllers/home_controller.dart';
+import '../route.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
-  static const String id = "home_page";
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -17,7 +15,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    final device = MediaQuery.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -40,177 +37,89 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        backgroundColor: Colors.white,
         elevation: 0.5,
       ),
-      body: GetBuilder<ChatController>(
-        assignId: true,
-        init: ChatController(),
-        builder: (controller) {
-          return Stack(
-            children: [
-              controller.chatMessages.isNotEmpty
-                  ? ListView.builder(
-                      padding:
-                          EdgeInsets.only(bottom: device.size.height * 0.2),
-                      shrinkWrap: true,
-                      itemCount: controller.chatMessages.length,
-                      reverse: false,
-                      controller: controller.scrollController,
-                      itemBuilder: (context, index) {
-                        final query = controller.chatMessages[index].query;
-                        final response =
-                            controller.chatMessages[index].response;
-                        bool isLast =
-                            index == controller.chatMessages.length - 1;
-                        bool isRead = false;
-                        if (controller.chatMessages[index].read == false) {
-                          controller.chatMessages[index].setRead(true);
-                        } else {
-                          isRead = true;
-                        }
-                        return QueryTile(
-                            isLast: isLast,
-                            isRead: isRead,
-                            query: query,
-                            response: response);
-                      },
-                    )
-                  : controller.chatMessages.isEmpty
-                      ? Positioned(
-                          top: 0,
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          child: Column(
-                            children: [
-                              Center(
-                                  child: Image.asset(
-                                "assets/pngs/little-bot.png",
-                                height: 300,
-                                width: 300,
-                              )),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              const Text(
-                                "Start a new conversation ✨",
-                                style: TextStyle(
-                                    color: Colors.black38, fontSize: 23),
-                              ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              const Text(
-                                "Type your message at the bottom\nand press send button.",
-                                style: TextStyle(
-                                    color: Colors.black38, fontSize: 16),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        )
-                      : const SpinKitPulse(
-                          color: Colors.blue,
+      floatingActionButton: FloatingActionButton(
+          child: const Icon(
+            Icons.add,
+            color: Colors.white,
+            size: 40,
+          ),
+          onPressed: () {
+            HomeController.to.createTextChatRoom();
+          }),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            child: Text(
+              'Text chats',
+              style: TextStyle(color: Colors.black, fontSize: 30),
+            ),
+          ),
+          GetBuilder<HomeController>(
+            assignId: true,
+            init: HomeController(),
+            autoRemove: false,
+            builder: (controller) {
+              if (controller.chatRooms.isNotEmpty) {
+                return Expanded(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: controller.chatRooms.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        leading: const Icon(
+                          Icons.history,
                           size: 30,
                         ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(
-                          color: Colors.grey.withOpacity(0.3), width: 1.0),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 8.0, bottom: 4.0),
-                                child: TextField(
-                                  controller: controller.inputController,
-                                  minLines: 1,
-                                  maxLines: 8,
-                                  decoration: InputDecoration(
-                                    hintText: "Type your message here..",
-                                    hintStyle: TextStyle(
-                                        color: Colors.grey.withOpacity(0.8)),
-                                    border: InputBorder.none,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                        title: Text(
+                          controller.chatRooms[index].name,
+                          style: const TextStyle(
+                              color: Colors.black, fontSize: 15),
                         ),
-                        Row(
-                          children: [
-                            const SizedBox(
-                              width: 8,
-                            ),
-                            Obx(() => Text(
-                                  '${controller.characterCount.value} / ${MAX_CHAR.toString()}',
-                                  style: TextStyle(
-                                      fontSize: 12.0,
-                                      color:
-                                          controller.characterCount > MAX_CHAR
-                                              ? Colors.red
-                                              : null),
-                                )),
-                            const Spacer(),
-                            Obx(() => ElevatedButton(
-                                  onPressed: !controller
-                                              .isSendingMessage.value &&
-                                          controller.characterCount < MAX_CHAR
-                                      ? () {
-                                          // close keyboard
-                                          FocusManager.instance.primaryFocus
-                                              ?.unfocus();
-                                          // send message
-                                          controller.sendChatMessage();
-                                        }
-                                      : null,
-                                  child: !controller.isSendingMessage.value
-                                      ? const Row(
-                                          children: [
-                                            Text(
-                                              'Send',
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                            SizedBox(
-                                              width: 3,
-                                            ),
-                                            Icon(
-                                              Icons.send_rounded,
-                                              color: Colors.white,
-                                              size: 15,
-                                            )
-                                          ],
-                                        )
-                                      : const SpinKitPulse(
-                                          color: Colors.white,
-                                          size: 25,
-                                        ),
-                                ))
-                          ],
+                        onTap: () {
+                          // go to text chat page
+                          Get.toNamed(Routes.textChatPage, arguments: {
+                            'roomId': controller.chatRooms[index].id
+                          });
+                        },
+                        subtitle: Text(
+                          'Created on : ${DateFormat('d MMMM, h:mm a').format(DateTime.parse(controller.chatRooms[index].createdOn).toLocal())}',
+                          style: const TextStyle(
+                              color: Colors.black54, fontSize: 12),
                         ),
-                      ],
-                    ),
+                        trailing: IconButton(
+                          onPressed: () async {
+                            await controller
+                                .deleteChatRoom(controller.chatRooms[index].id);
+                          },
+                          icon: const Icon(
+                            Icons.delete,
+                            size: 30,
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                ),
-              ),
-            ],
-          );
-        },
+                );
+              } else if (controller.chatRooms.isEmpty &&
+                  controller.initialized) {
+                return const Center(
+                  child: Text(
+                    'No chats available',
+                    style: TextStyle(color: Colors.black, fontSize: 15),
+                  ),
+                );
+              } else {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+            },
+          )
+        ],
       ),
     );
   }
