@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:syncia/controllers/home_controller.dart';
+import '../controllers/theme_controller.dart';
 import '../widgets/text_chat_room_tile.dart';
 
 class HomePage extends StatefulWidget {
@@ -29,21 +30,26 @@ class _HomePageState extends State<HomePage> {
             ),
             const Text(
               'Syncia',
-              style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w500),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
             ),
           ],
         ),
+        actions: [
+          Obx(() => Switch(
+                value: Get.find<ThemeController>().isDarkTheme.value,
+                onChanged: (value) => Get.find<ThemeController>().toggleTheme(),
+              )),
+        ],
         elevation: 0.5,
       ),
       floatingActionButton: FloatingActionButton(
-          child: const Icon(
-            Icons.add,
-            color: Colors.white,
-            size: 40,
-          ),
+          child: Obx(() => Icon(
+                Icons.add,
+                color: ThemeController.to.isDarkTheme.value
+                    ? Colors.blue
+                    : Colors.white,
+                size: 40,
+              )),
           onPressed: () {
             HomeController.to.createTextChatRoom();
           }),
@@ -54,7 +60,7 @@ class _HomePageState extends State<HomePage> {
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             child: Text(
               'Text chats',
-              style: TextStyle(color: Colors.black, fontSize: 30),
+              style: TextStyle(fontSize: 30),
             ),
           ),
           GetBuilder<HomeController>(
@@ -79,7 +85,7 @@ class _HomePageState extends State<HomePage> {
                 return const Center(
                   child: Text(
                     'No chats available',
-                    style: TextStyle(color: Colors.black, fontSize: 15),
+                    style: TextStyle(fontSize: 15),
                   ),
                 );
               } else {
