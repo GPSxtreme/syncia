@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:syncia/controllers/theme_controller.dart';
 import 'package:syncia/widgets/markdown_response_tile.dart';
 
 class QueryTile extends StatefulWidget {
@@ -54,7 +56,7 @@ class _QueryTileState extends State<QueryTile> {
                           tooltip: 'copy response',
                           onPressed: () {
                             Clipboard.setData(ClipboardData(text: widget.response));
-                          }, icon: const Icon(Icons.copy, color: Colors.black,)),
+                          }, icon: Obx(() => Icon(Icons.copy,color: ThemeController.to.isDarkTheme.value ? Colors.white : Colors.black,))),
                     )
                   ],
                 )
