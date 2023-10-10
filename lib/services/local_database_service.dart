@@ -18,12 +18,11 @@ class DatabaseService {
 
   Future<Database> get database async {
     final status = await Permission.storage.status;
-    if(status.isDenied || status.isRestricted){
+    if (status.isDenied || status.isRestricted) {
       await Permission.storage.request();
     }
     return _database ??= await _databaseFactory.openDatabase(
-        '${(await getApplicationDocumentsDirectory()).path}/$dbName'
-    );
+        '${(await getApplicationDocumentsDirectory()).path}/$dbName');
   }
 
   StoreRef<int, Map<String, dynamic>> _store(String name) =>
@@ -39,15 +38,17 @@ class DatabaseService {
       createdOn: DateTime.now().toIso8601String(),
     );
     await dataStore.add(await database, chatRoom.toMap());
-    await messageStore.add(await database, ChatRoomMessages(id: id,messages: []).toJson());
+    await messageStore.add(
+        await database, ChatRoomMessages(id: id, messages: []).toJson());
     return id;
   }
 
-
-  Future<void> _modifyMessages(int roomId, Function(List<Map<String, dynamic>>) modify) async {
+  Future<void> _modifyMessages(
+      int roomId, Function(List<Map<String, dynamic>>) modify) async {
     final db = await database;
     final messageStore = _store(chatRoomsMessagesStoreName);
-    final snapshot = await messageStore.findFirst(db, finder: Finder(filter: Filter.equals('id', roomId)));
+    final snapshot = await messageStore.findFirst(db,
+        finder: Finder(filter: Filter.equals('id', roomId)));
 
     if (snapshot == null) {
       throw Exception('Chat room not found');
@@ -62,7 +63,8 @@ class DatabaseService {
     await _modifyMessages(roomId, (messages) => messages.add(message.toMap()));
   }
 
-  Future<List<ChatMessage>> getChatMessages(int roomId, {int end = 0, int limit = 20}) async {
+  Future<List<ChatMessage>> getChatMessages(int roomId,
+      {int end = 0, int limit = 20}) async {
     final db = await database;
     final messageStore = _store(chatRoomsMessagesStoreName);
 
@@ -74,7 +76,8 @@ class DatabaseService {
 
     if (snapshot != null) {
       final chatRoom = ChatRoomMessages.fromJson(snapshot.value);
-      final allMessages = chatRoom.messages.map((e) => ChatMessage.fromMap(e)).toList();
+      final allMessages =
+          chatRoom.messages.map((e) => ChatMessage.fromMap(e)).toList();
 
       // Determine the start and end indexes for slicing
       int startIndex = max(0, allMessages.length - end - limit);
@@ -89,25 +92,26 @@ class DatabaseService {
     }
   }
 
-
-
-
-
   Future<List<ChatRoomData>> getChatRooms() async {
     final snapshots = await _store(chatRoomsDataStoreName).find(await database);
-    return snapshots.map((snapshot) => ChatRoomData.fromMap(snapshot.value)).toList();
+    return snapshots
+        .map((snapshot) => ChatRoomData.fromMap(snapshot.value))
+        .toList();
   }
 
   Future<ChatRoomData> getChatRoomById(int id) async {
-    final snapshot = await _store(chatRoomsDataStoreName).record(id).get(await database);
-    if(snapshot == null) {
+    final snapshot =
+        await _store(chatRoomsDataStoreName).record(id).get(await database);
+    if (snapshot == null) {
       throw Exception('Chat room not found');
     }
     return ChatRoomData.fromMap(snapshot);
   }
 
   Future<void> updateChatRoom(ChatRoomData room) async {
-    await _store(chatRoomsDataStoreName).record(room.id).update(await database, room.toMap());
+    await _store(chatRoomsDataStoreName)
+        .record(room.id)
+        .update(await database, room.toMap());
   }
 
   Future<void> deleteChatRoom(int id) async {
@@ -121,4 +125,3 @@ class DatabaseService {
     ]);
   }
 }
-
