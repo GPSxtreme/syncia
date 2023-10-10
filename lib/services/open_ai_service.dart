@@ -35,8 +35,8 @@ class OpenAiService{
     );
   }
 
-  /// Returns the chat completion model with the given id
-  Future<OpenAIChatCompletionModel> chatCompletion(
+  /// Returns the chat completion model with the given id and chat history
+  Future<OpenAIChatCompletionModel> chatCompletionWithHistory(
       String content,
       String model,
       List<OpenAIChatCompletionChoiceMessageModel> currentChatHistory,
@@ -48,7 +48,6 @@ class OpenAiService{
         role: OpenAIChatMessageRole.user,
       ),
     );
-
     var response = await OpenAI.instance.chat.create(
       model: model,
       messages: currentChatHistory,
@@ -57,6 +56,21 @@ class OpenAiService{
     return response;
   }
 
+  /// Returns the chat completion model with the given prompt
+  Future<OpenAIChatCompletionModel> chatCompletion(
+      String content,
+      String model,
+      ) async {
+    return await OpenAI.instance.chat.create(
+      model: model,
+      messages: [
+        OpenAIChatCompletionChoiceMessageModel(
+          content: content,
+          role: OpenAIChatMessageRole.user,
+        ),
+      ],
+    );
+  }
 
   /// Returns the stream chat completion model with the given id
   Future<Stream<OpenAIStreamChatCompletionModel>> streamChatCompletion(String prompt,String model)async{
