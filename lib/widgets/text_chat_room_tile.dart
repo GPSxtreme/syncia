@@ -20,8 +20,7 @@ class TextChatRoomTile extends StatelessWidget {
           TypewriterAnimatedText(
             chatRoomData.name,
             speed: const Duration(milliseconds: 100),
-            textStyle: const TextStyle(
-                color: Colors.black, fontSize: 15),
+            textStyle: const TextStyle(fontSize: 15),
           )
         ],
 
@@ -34,8 +33,7 @@ class TextChatRoomTile extends StatelessWidget {
       },
       subtitle: Text(
         'Created on : ${DateFormat('d MMMM, h:mm a').format(DateTime.parse(chatRoomData.createdOn).toLocal())}',
-        style: const TextStyle(
-            color: Colors.black54, fontSize: 12),
+        style: const TextStyle(fontSize: 12),
       ),
       trailing: IconButton(
         onPressed: () async {
