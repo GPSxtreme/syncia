@@ -1,3 +1,4 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -74,10 +75,18 @@ class _HomePageState extends State<HomePage> {
                           Icons.history,
                           size: 30,
                         ),
-                        title: Text(
-                          controller.chatRooms[index].name,
-                          style: const TextStyle(
-                              color: Colors.black, fontSize: 15),
+                        title: AnimatedTextKit(
+                          isRepeatingAnimation: false,
+                          totalRepeatCount: 1,
+                          animatedTexts: [
+                          TypewriterAnimatedText(
+                            controller.chatRooms[index].name,
+                            speed: const Duration(milliseconds: 100),
+                            textStyle: const TextStyle(
+                                color: Colors.black, fontSize: 15),
+                          )
+                        ],
+
                         ),
                         onTap: () {
                           // go to text chat page
