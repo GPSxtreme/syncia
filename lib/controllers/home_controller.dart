@@ -28,9 +28,9 @@ class HomeController extends GetxController {
     Future<void> proceedWithCreation() async {
       if (roomNameController.text.isNotEmpty) {
         int roomId = await databaseService.createChatRoom(roomNameController.text);
+        Get.back();
         Get.toNamed(Routes.textChatPage, arguments: {'roomId': roomId, 'isNew': true});
         await getChatRooms();
-        Get.back();  // Close the dialog
       } else {
         Get.snackbar('Error', 'Room name cannot be empty!');
       }
@@ -62,7 +62,9 @@ class HomeController extends GetxController {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 ElevatedButton(
-                  onPressed: proceedWithCreation,
+                  onPressed: (){
+                    proceedWithCreation();
+                  } ,
                   child: const Text('Create',style: TextStyle(color: Colors.white),),
                 ),
               ],
