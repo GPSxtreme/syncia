@@ -11,6 +11,7 @@ const int MAX_CHAR = 10000;
 
 class ChatController extends GetxController {
   final int roomId;
+  final bool isNew;
   static ChatController get to => Get.find();
   RxList<ChatMessage> chatMessages = RxList<ChatMessage>();
   final TextEditingController inputController = TextEditingController();
@@ -18,11 +19,11 @@ class ChatController extends GetxController {
   final DatabaseService databaseService = DatabaseService();
   final RxBool isSendingMessage = false.obs;
   final RxInt characterCount = 0.obs;
-  final RxBool showScrollToTopBtn = true.obs;
-  final RxBool showScrollToBottomBtn = true.obs;
+  final RxBool showScrollToTopBtn = false.obs;
+  final RxBool showScrollToBottomBtn = false.obs;
 
 
-  ChatController({required this.roomId}) {
+  ChatController({required this.roomId , this.isNew = false}){
     inputController.addListener(_updateCharacterCount);
     scrollController.addListener(_handleScrollEvent);
   }
@@ -54,22 +55,28 @@ class ChatController extends GetxController {
     // Calculate the thresholds based on percentages
     final double topThreshold = totalExtent * 0.15; // 15% from the top
     final double bottomThreshold = totalExtent * 0.85; // 85% from the bottom
+    if(scrollController.hasClients){
       if (currentOffset <= topThreshold) {
-      // The user is in the top 20% of the list
-      showScrollToTopBtn.value = false;
-      showScrollToBottomBtn.value = true;
-      if (scrollController.position.atEdge && scrollController.position.pixels == 0){
-        _loadAndPositionMessages(); // Load more messages when at the top
+        // The user is in the top 20% of the list
+        showScrollToTopBtn.value = false;
+        showScrollToBottomBtn.value = true;
+        if (scrollController.position.atEdge && scrollController.position.pixels == 0){
+          _loadAndPositionMessages(); // Load more messages when at the top
+        }
+      } else if (currentOffset >= bottomThreshold) {
+        // The user is in the bottom 15% of the list
+        showScrollToTopBtn.value = true;
+        showScrollToBottomBtn.value = false;
+      } else {
+        // The user is somewhere in between the top 15% and bottom 15%
+        showScrollToTopBtn.value = true;
+        showScrollToBottomBtn.value = true;
       }
-    } else if (currentOffset >= bottomThreshold) {
-      // The user is in the bottom 15% of the list
-      showScrollToTopBtn.value = true;
+    } else{
+      showScrollToTopBtn.value = false;
       showScrollToBottomBtn.value = false;
-    } else {
-      // The user is somewhere in between the top 15% and bottom 15%
-      showScrollToTopBtn.value = true;
-      showScrollToBottomBtn.value = true;
     }
+
   }
 
 
@@ -137,7 +144,7 @@ class ChatController extends GetxController {
 
     try {
       // Assuming OpenAiService is a Singleton
-      final response = await OpenAiService().chatCompletion(question.trim(), 'gpt-3.5-turbo', currentChatHistory);
+      final response = await OpenAiService().chatCompletionWithHistory(question.trim(), 'gpt-3.5-turbo', currentChatHistory);
 
       // Message for animation
       ChatMessage animatedMessage = ChatMessage(
@@ -160,6 +167,11 @@ class ChatController extends GetxController {
       );
 
       await databaseService.saveChatMessage(roomId, storedMessage);
+
+      if(isNew){
+        // set room name
+
+      }
 
       inputController.clear();
 
