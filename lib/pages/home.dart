@@ -1,10 +1,8 @@
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:syncia/controllers/home_controller.dart';
-import '../route.dart';
+import '../widgets/text_chat_room_tile.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -70,45 +68,8 @@ class _HomePageState extends State<HomePage> {
                     shrinkWrap: true,
                     itemCount: controller.chatRooms.length,
                     itemBuilder: (context, index) {
-                      return ListTile(
-                        leading: const Icon(
-                          Icons.history,
-                          size: 30,
-                        ),
-                        title: AnimatedTextKit(
-                          isRepeatingAnimation: false,
-                          totalRepeatCount: 1,
-                          animatedTexts: [
-                          TypewriterAnimatedText(
-                            controller.chatRooms[index].name,
-                            speed: const Duration(milliseconds: 100),
-                            textStyle: const TextStyle(
-                                color: Colors.black, fontSize: 15),
-                          )
-                        ],
-
-                        ),
-                        onTap: () {
-                          // go to text chat page
-                          Get.toNamed(Routes.textChatPage, arguments: {
-                            'roomId': controller.chatRooms[index].id
-                          });
-                        },
-                        subtitle: Text(
-                          'Created on : ${DateFormat('d MMMM, h:mm a').format(DateTime.parse(controller.chatRooms[index].createdOn).toLocal())}',
-                          style: const TextStyle(
-                              color: Colors.black54, fontSize: 12),
-                        ),
-                        trailing: IconButton(
-                          onPressed: () async {
-                            await controller
-                                .deleteChatRoom(controller.chatRooms[index].id);
-                          },
-                          icon: const Icon(
-                            Icons.delete,
-                            size: 30,
-                          ),
-                        ),
+                      return TextChatRoomTile(
+                        chatRoomData: controller.chatRooms[index],
                       );
                     },
                   ),
