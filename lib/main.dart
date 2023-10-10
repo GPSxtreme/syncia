@@ -7,6 +7,6 @@ Future<void> main() async {
   await dotenv
       .load(fileName: ".env")
       .then((_) => OpenAI.apiKey = dotenv.env['API_KEY']!);
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
