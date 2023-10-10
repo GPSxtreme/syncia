@@ -8,7 +8,6 @@ import '../services/open_ai_service.dart';
 
 const int MAX_CHAR = 10000;
 
-
 class ChatController extends GetxController {
   final int roomId;
   final bool isNew;
@@ -22,8 +21,7 @@ class ChatController extends GetxController {
   final RxBool showScrollToTopBtn = false.obs;
   final RxBool showScrollToBottomBtn = false.obs;
 
-
-  ChatController({required this.roomId , this.isNew = false}){
+  ChatController({required this.roomId, this.isNew = false}) {
     inputController.addListener(_updateCharacterCount);
     scrollController.addListener(_handleScrollEvent);
   }
@@ -47,7 +45,6 @@ class ChatController extends GetxController {
     chatMessages.addAll(messages.toList());
   }
 
-
   void _handleScrollEvent() {
     final double totalExtent = scrollController.position.maxScrollExtent;
     final double currentOffset = scrollController.position.pixels;
@@ -55,12 +52,13 @@ class ChatController extends GetxController {
     // Calculate the thresholds based on percentages
     final double topThreshold = totalExtent * 0.15; // 15% from the top
     final double bottomThreshold = totalExtent * 0.85; // 85% from the bottom
-    if(scrollController.hasClients){
+    if (scrollController.hasClients) {
       if (currentOffset <= topThreshold) {
         // The user is in the top 20% of the list
         showScrollToTopBtn.value = false;
         showScrollToBottomBtn.value = true;
-        if (scrollController.position.atEdge && scrollController.position.pixels == 0){
+        if (scrollController.position.atEdge &&
+            scrollController.position.pixels == 0) {
           _loadAndPositionMessages(); // Load more messages when at the top
         }
       } else if (currentOffset >= bottomThreshold) {
@@ -72,14 +70,11 @@ class ChatController extends GetxController {
         showScrollToTopBtn.value = true;
         showScrollToBottomBtn.value = true;
       }
-    } else{
+    } else {
       showScrollToTopBtn.value = false;
       showScrollToBottomBtn.value = false;
     }
-
   }
-
-
 
   Future<void> _loadAndPositionMessages() async {
     double previousScrollHeight = scrollController.position.maxScrollExtent;
@@ -89,15 +84,16 @@ class ChatController extends GetxController {
     double newScrollHeight = scrollController.position.maxScrollExtent;
 
     // This will keep the scroll position right at the top of the newly loaded messages.
-    scrollController.jumpTo(scrollController.offset + (newScrollHeight - previousScrollHeight));
+    scrollController.jumpTo(
+        scrollController.offset + (newScrollHeight - previousScrollHeight));
   }
 
-
   Future<void> _loadOlderMessages() async {
-    final olderMessages = await databaseService.getChatMessages(roomId, end: chatMessages.length, limit: 20);
+    final olderMessages = await databaseService.getChatMessages(roomId,
+        end: chatMessages.length, limit: 20);
 
     // Check if there are no more older messages
-    if(olderMessages.isEmpty) {
+    if (olderMessages.isEmpty) {
       return;
     }
 
@@ -117,7 +113,7 @@ class ChatController extends GetxController {
     characterCount.value = inputController.text.length;
   }
 
-  void addMessage(ChatMessage message){
+  void addMessage(ChatMessage message) {
     chatMessages.add(message);
   }
 
@@ -130,21 +126,24 @@ class ChatController extends GetxController {
     final question = inputController.text;
 
     // Generating the chat history
-    var currentChatHistory = chatMessages.expand((message) => [
-      OpenAIChatCompletionChoiceMessageModel(
-        content: message.query,
-        role: OpenAIChatMessageRole.user,
-      ),
-      if (message.response.isNotEmpty)
-        OpenAIChatCompletionChoiceMessageModel(
-          content: message.response,
-          role: OpenAIChatMessageRole.system,
-        ),
-    ]).toList();
+    var currentChatHistory = chatMessages
+        .expand((message) => [
+              OpenAIChatCompletionChoiceMessageModel(
+                content: message.query,
+                role: OpenAIChatMessageRole.user,
+              ),
+              if (message.response.isNotEmpty)
+                OpenAIChatCompletionChoiceMessageModel(
+                  content: message.response,
+                  role: OpenAIChatMessageRole.system,
+                ),
+            ])
+        .toList();
 
     try {
       // Assuming OpenAiService is a Singleton
-      final response = await OpenAiService().chatCompletionWithHistory(question.trim(), 'gpt-3.5-turbo', currentChatHistory);
+      final response = await OpenAiService().chatCompletionWithHistory(
+          question.trim(), 'gpt-3.5-turbo', currentChatHistory);
 
       // Message for animation
       ChatMessage animatedMessage = ChatMessage(
@@ -152,8 +151,7 @@ class ChatController extends GetxController {
           query: question.trim(),
           response: response.choices[0].message.content.trim(),
           timestamp: DateTime.now(),
-          read: false
-      );
+          read: false);
 
       addMessage(animatedMessage);
 
@@ -163,14 +161,12 @@ class ChatController extends GetxController {
           query: question.trim(),
           response: response.choices[0].message.content.trim(),
           timestamp: DateTime.now(),
-          read: true
-      );
+          read: true);
 
       await databaseService.saveChatMessage(roomId, storedMessage);
 
-      if(isNew){
+      if (isNew) {
         // set room name
-
       }
 
       inputController.clear();
@@ -185,10 +181,9 @@ class ChatController extends GetxController {
     }
   }
 
-
   Future<void> scrollToBottom({bool addDelay = true}) async {
     // Wait for the animation to complete
-    if(addDelay) {
+    if (addDelay) {
       await Future.delayed(const Duration(milliseconds: 200));
     }
 
@@ -200,9 +195,9 @@ class ChatController extends GetxController {
     );
   }
 
-  Future<void> scrollToTop({bool addDelay = true}) async{
+  Future<void> scrollToTop({bool addDelay = true}) async {
     // Wait for the animation to complete
-    if(addDelay) {
+    if (addDelay) {
       await Future.delayed(const Duration(milliseconds: 200));
     }
     // Scroll to the top
@@ -220,11 +215,10 @@ class ChatController extends GetxController {
     await _loadOlderMessages();
 
     // Calculate the new scroll position.
-    double newScrollPosition = scrollController.position.maxScrollExtent - scrollPositionBeforeLoading;
+    double newScrollPosition =
+        scrollController.position.maxScrollExtent - scrollPositionBeforeLoading;
 
     // Jump to the new scroll position.
     scrollController.jumpTo(newScrollPosition);
   }
-
 }
-
