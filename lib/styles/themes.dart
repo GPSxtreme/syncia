@@ -25,7 +25,7 @@ final lightTheme = ThemeData(
     listTileTheme: const ListTileThemeData(
         iconColor: Colors.blue,
         subtitleTextStyle: TextStyle(
-          color: Colors.white12,
+          color: Colors.black54,
         )));
 
 final darkTheme = ThemeData(
@@ -49,5 +49,5 @@ final darkTheme = ThemeData(
     listTileTheme: const ListTileThemeData(
         iconColor: Colors.blue,
         subtitleTextStyle: TextStyle(
-          color: Colors.white12,
+          color: Colors.white54,
         )));
