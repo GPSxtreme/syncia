@@ -10,6 +10,7 @@ const int MAX_CHAR = 10000;
 
 class ChatController extends GetxController {
   final int roomId;
+  final String modelId;
   final bool isNew;
   static ChatController get to => Get.find();
   RxList<ChatMessage> chatMessages = RxList<ChatMessage>();
@@ -21,7 +22,8 @@ class ChatController extends GetxController {
   final RxBool showScrollToTopBtn = false.obs;
   final RxBool showScrollToBottomBtn = false.obs;
 
-  ChatController({required this.roomId, this.isNew = false}) {
+  ChatController(
+      {required this.roomId, this.isNew = false, required this.modelId}) {
     inputController.addListener(_updateCharacterCount);
     scrollController.addListener(_handleScrollEvent);
   }
@@ -125,7 +127,6 @@ class ChatController extends GetxController {
     isSendingMessage.value = true;
     final question = inputController.text;
 
-    // Generating the chat history
     var currentChatHistory = chatMessages
         .expand((message) => [
               OpenAIChatCompletionChoiceMessageModel(
@@ -141,44 +142,60 @@ class ChatController extends GetxController {
         .toList();
 
     try {
-      // Assuming OpenAiService is a Singleton
-      final response = await OpenAiService().chatCompletionWithHistory(
-          question.trim(), 'gpt-3.5-turbo', currentChatHistory);
+      final stream = await OpenAiService.streamChatCompletionWithHistory(
+          question.trim(), modelId, currentChatHistory);
 
-      // Message for animation
-      ChatMessage animatedMessage = ChatMessage(
-          id: response.id,
-          query: question.trim(),
-          response: response.choices[0].message.content.trim(),
-          timestamp: DateTime.now(),
-          read: false);
+      StringBuffer streamedResponse = StringBuffer();
 
-      addMessage(animatedMessage);
+      if (stream != null) {
+        String? id;
+        stream.listen((response) {
+          id = response.id;
+          streamedResponse.write(response.choices.first.delta.content!);
 
-      // Message to store to database
-      ChatMessage storedMessage = ChatMessage(
-          id: response.id,
-          query: question.trim(),
-          response: response.choices[0].message.content.trim(),
-          timestamp: DateTime.now(),
-          read: true);
+          ChatMessage message = ChatMessage(
+              id: id!,
+              query: question.trim(),
+              response: streamedResponse.toString(),
+              timestamp: DateTime.now(),
+              read: false);
 
-      await databaseService.saveChatMessage(roomId, storedMessage);
-
-      if (isNew) {
-        // set room name
+          addOrUpdateMessage(message);
+          scrollToBottom(addDelay: false);
+        }, onDone: () {
+          if (id != null) {
+            ChatMessage finalMessage = ChatMessage(
+                id: id!,
+                query: question.trim(),
+                response: streamedResponse.toString(),
+                timestamp: DateTime.now(),
+                read: true);
+            databaseService.saveChatMessage(roomId, finalMessage);
+            inputController.clear();
+            scrollToBottom();
+          }
+          isSendingMessage.value = false;
+        }, onError: (error) {
+          Get.snackbar('Error', 'Failed to process request.');
+          isSendingMessage.value = false;
+        });
+      } else {
+        Get.snackbar('Error', 'Failed to process request.');
       }
-
-      inputController.clear();
-
-      // Scroll to the newly added query
-      scrollToBottom();
     } catch (error) {
-      Exception("Error sending chat message: $error");
-      // TODO: Maybe show a user-friendly error message using a dialog or a snackbar.
-    } finally {
+      Get.snackbar('Error', 'Failed to process request.');
       isSendingMessage.value = false;
     }
+  }
+
+  void addOrUpdateMessage(ChatMessage message) {
+    int index = chatMessages.indexWhere((m) => m.id == message.id);
+    if (index != -1) {
+      chatMessages[index] = message;
+    } else {
+      chatMessages.add(message);
+    }
+    update();
   }
 
   Future<void> scrollToBottom({bool addDelay = true}) async {
@@ -186,13 +203,14 @@ class ChatController extends GetxController {
     if (addDelay) {
       await Future.delayed(const Duration(milliseconds: 200));
     }
-
-    // Scroll to the bottom
-    scrollController.animateTo(
-      scrollController.position.maxScrollExtent,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-    );
+    if (scrollController.hasClients) {
+      // Scroll to the bottom
+      scrollController.animateTo(
+        scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   Future<void> scrollToTop({bool addDelay = true}) async {
