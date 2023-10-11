@@ -71,6 +71,15 @@ class AppDrawer extends StatelessWidget {
                       )),
                 )),
             ListTile(
+              leading: const Icon(Icons.bookmark),
+              title: const Text('Saved'),
+              onTap: () {
+                Get.currentRoute != Routes.savedPage
+                    ? Get.offAndToNamed(Routes.savedPage)
+                    : Get.back();
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.settings),
               title: const Text('Settings'),
               onTap: () {
