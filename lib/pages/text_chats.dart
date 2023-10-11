@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:syncia/controllers/home_controller.dart';
 import 'package:syncia/widgets/app_drawer.dart';
+import 'package:syncia/widgets/create_text_chat_room_dialog_box.dart';
 import '../controllers/theme_controller.dart';
 import '../widgets/text_chat_room_tile.dart';
 
@@ -20,24 +20,7 @@ class _TextChatsPageState extends State<TextChatsPage> {
       drawer: const AppDrawer(),
       appBar: AppBar(
         centerTitle: true,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset(
-              'assets/svgs/app_bar_logo.svg',
-              height: 30,
-              width: 30,
-              fit: BoxFit.contain,
-            ),
-            const SizedBox(
-              width: 10.0,
-            ),
-            const Text(
-              'Syncia',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
-            ),
-          ],
-        ),
+        title: const Text('All chats'),
         elevation: 0.5,
       ),
       floatingActionButton: FloatingActionButton(
@@ -48,9 +31,13 @@ class _TextChatsPageState extends State<TextChatsPage> {
                     : Colors.white,
                 size: 40,
               )),
-          onPressed: () {
-            HomeController.to.createTextChatRoom();
-          }),
+          onPressed: () => showDialog(
+                context: context,
+                barrierDismissible: true,
+                builder: (context) {
+                  return CreateTextChatRoomDialogBox();
+                },
+              )),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
