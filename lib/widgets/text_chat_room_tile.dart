@@ -23,12 +23,12 @@ class TextChatRoomTile extends StatelessWidget {
             textStyle: const TextStyle(fontSize: 15),
           )
         ],
-
       ),
       onTap: () {
         // go to text chat page
         Get.toNamed(Routes.textChatPage, arguments: {
-          'roomId': chatRoomData.id
+          'roomId': chatRoomData.id,
+          'modelId': chatRoomData.modelName,
         });
       },
       subtitle: Text(
