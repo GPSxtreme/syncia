@@ -22,45 +22,50 @@ class _TextChatPageState extends State<TextChatPage> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0.5,
+        centerTitle: true,
+        title: Text(Get.arguments['modelId']),
       ),
       body: GetX<ChatController>(
         assignId: true,
-        init: ChatController(roomId: Get.arguments['roomId']),
+        init: ChatController(
+            roomId: Get.arguments['roomId'], modelId: Get.arguments['modelId']),
         builder: (controller) {
           return Stack(
             children: [
               controller.chatMessages.isNotEmpty
                   ? Scrollbar(
-                controller: controller.scrollController,
-                    interactive: true,
-                    thickness: 5.0,
-                    child: ListView.builder(
-                padding: EdgeInsets.only(bottom: SizeConfig.screenHeight! * 0.2),
-                shrinkWrap: true,
-                reverse: false,
-                itemCount: controller.chatMessages.length,
-                controller: controller.scrollController,
-                itemBuilder: (context, index) {
-                    final chatMessage = controller.chatMessages[index];
-                    final query = chatMessage.query;
-                    final response = chatMessage.response;
+                      controller: controller.scrollController,
+                      interactive: true,
+                      thickness: 5.0,
+                      child: ListView.builder(
+                        padding: EdgeInsets.only(
+                            bottom: SizeConfig.screenHeight! * 0.2),
+                        shrinkWrap: true,
+                        reverse: false,
+                        itemCount: controller.chatMessages.length,
+                        controller: controller.scrollController,
+                        itemBuilder: (context, index) {
+                          final chatMessage = controller.chatMessages[index];
+                          final query = chatMessage.query;
+                          final response = chatMessage.response;
 
-                    // Since the list is reversed, index 0 represents the latest message.
-                    bool isLast = index == controller.chatMessages.length - 1;
-                    bool isRead = chatMessage.read;
+                          // Since the list is reversed, index 0 represents the latest message.
+                          bool isLast =
+                              index == controller.chatMessages.length - 1;
+                          bool isRead = chatMessage.read;
 
-                    if (!isRead) {
-                      chatMessage.setRead(true);
-                    }
-                    return QueryTile(
-                      isLast: isLast,
-                      isRead: isRead,
-                      query: query,
-                      response: response,
-                    );
-                },
-              ),
-                  )
+                          if (!isRead) {
+                            chatMessage.setRead(true);
+                          }
+                          return QueryTile(
+                            isLast: isLast,
+                            isRead: isRead,
+                            query: query,
+                            response: response,
+                          );
+                        },
+                      ),
+                    )
                   : controller.chatMessages.isEmpty && controller.initialized
                       ? Positioned(
                           top: 0,
@@ -100,45 +105,44 @@ class _TextChatPageState extends State<TextChatPage> {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    if(controller.showScrollToTopBtn.value)
-                    RawMaterialButton(
-                      onPressed: () {
-                        controller.scrollToTop(addDelay: false);
-                      },
-                      elevation: 2.0,
-                      fillColor: Colors.blue,
-                      padding: const EdgeInsets.all(3.0),
-                      shape: const CircleBorder(),
-                      child: const Icon(
-                        Icons.keyboard_arrow_up,
-                        color: Colors.white,
-                        size: 30.0,
-                      ),
-                    ),
-                    if(controller.showScrollToBottomBtn.value)
-                    RawMaterialButton(
-                      onPressed: () {
-                        controller.scrollToBottom(addDelay: false);
-                      },
-                      elevation: 2.0,
-                      fillColor: Colors.blue,
-                      padding: const EdgeInsets.all(3.0),
-                      shape: const CircleBorder(),
-                      child: const Icon(
-                        Icons.keyboard_arrow_down,
-                        color: Colors.white,
-                        size: 30.0,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextChatTextField(),
-                    )
-                  ]
-                ),
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      if (controller.showScrollToTopBtn.value)
+                        RawMaterialButton(
+                          onPressed: () {
+                            controller.scrollToTop(addDelay: false);
+                          },
+                          elevation: 2.0,
+                          fillColor: Colors.blue,
+                          padding: const EdgeInsets.all(3.0),
+                          shape: const CircleBorder(),
+                          child: const Icon(
+                            Icons.keyboard_arrow_up,
+                            color: Colors.white,
+                            size: 30.0,
+                          ),
+                        ),
+                      if (controller.showScrollToBottomBtn.value)
+                        RawMaterialButton(
+                          onPressed: () {
+                            controller.scrollToBottom(addDelay: false);
+                          },
+                          elevation: 2.0,
+                          fillColor: Colors.blue,
+                          padding: const EdgeInsets.all(3.0),
+                          shape: const CircleBorder(),
+                          child: const Icon(
+                            Icons.keyboard_arrow_down,
+                            color: Colors.white,
+                            size: 30.0,
+                          ),
+                        ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextChatTextField(),
+                      )
+                    ]),
               ),
             ],
           );
