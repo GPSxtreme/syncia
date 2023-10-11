@@ -28,13 +28,14 @@ class DatabaseService {
   StoreRef<int, Map<String, dynamic>> _store(String name) =>
       intMapStoreFactory.store(name);
 
-  Future<int> createChatRoom(String name) async {
+  Future<int> createChatRoom(String name, String modelName) async {
     final dataStore = intMapStoreFactory.store(chatRoomsDataStoreName);
     final messageStore = intMapStoreFactory.store(chatRoomsMessagesStoreName);
     int id = await dataStore.generateIntKey(await database);
     final chatRoom = ChatRoomData(
       id: id,
       name: name,
+      modelName: modelName,
       createdOn: DateTime.now().toIso8601String(),
     );
     await dataStore.add(await database, chatRoom.toMap());
