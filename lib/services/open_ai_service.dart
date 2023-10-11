@@ -1,19 +1,21 @@
 import 'package:dart_openai/dart_openai.dart';
+import 'package:get/get.dart';
 
-class OpenAiService{
-  List<OpenAIModelModel> models = [];
+class OpenAiService {
+  static List<OpenAIModelModel> models = [];
 
-  init() async {
+  static Future<void> init() async {
     models = await OpenAI.instance.model.list();
   }
 
   /// Returns the model with the given id
-  Future<OpenAIModelModel> retrieveModel(String id)async{
+  static Future<OpenAIModelModel> retrieveModel(String id) async {
     return await OpenAI.instance.model.retrieve(id);
   }
 
   /// Returns the completion model with the given id
-  Future<OpenAICompletionModel> getCompletion(String prompt,String model)async{
+  static Future<OpenAICompletionModel> getCompletion(
+      String prompt, String model) async {
     return await OpenAI.instance.completion.create(
       model: model,
       prompt: prompt,
@@ -25,7 +27,8 @@ class OpenAiService{
   }
 
   /// Returns the stream completion model with the given id
-  Future<Stream<OpenAIStreamCompletionModel>> streamCompletion(String prompt,String model)async{
+  static Future<Stream<OpenAIStreamCompletionModel>> streamCompletion(
+      String prompt, String model) async {
     return OpenAI.instance.completion.createStream(
       model: model,
       prompt: prompt,
@@ -36,31 +39,36 @@ class OpenAiService{
   }
 
   /// Returns the chat completion model with the given id and chat history
-  Future<OpenAIChatCompletionModel> chatCompletionWithHistory(
-      String content,
-      String model,
-      List<OpenAIChatCompletionChoiceMessageModel> currentChatHistory,
-      ) async {
-    // Add the new user message to the provided chat history
-    currentChatHistory.add(
-      OpenAIChatCompletionChoiceMessageModel(
-        content: content,
-        role: OpenAIChatMessageRole.user,
-      ),
-    );
-    var response = await OpenAI.instance.chat.create(
-      model: model,
-      messages: currentChatHistory,
-    );
+  static Future<OpenAIChatCompletionModel?> chatCompletionWithHistory(
+    String content,
+    String model,
+    List<OpenAIChatCompletionChoiceMessageModel> currentChatHistory,
+  ) async {
+    try {
+      // Add the new user message to the provided chat history
+      currentChatHistory.add(
+        OpenAIChatCompletionChoiceMessageModel(
+          content: content,
+          role: OpenAIChatMessageRole.user,
+        ),
+      );
+      var response = await OpenAI.instance.chat.create(
+        model: model,
+        messages: currentChatHistory,
+      );
 
-    return response;
+      return response;
+    } on RequestFailedException catch (e) {
+      Get.snackbar('Error', e.message);
+    }
+    return null;
   }
 
   /// Returns the chat completion model with the given prompt
-  Future<OpenAIChatCompletionModel> chatCompletion(
-      String content,
-      String model,
-      ) async {
+  static Future<OpenAIChatCompletionModel> chatCompletion(
+    String content,
+    String model,
+  ) async {
     return await OpenAI.instance.chat.create(
       model: model,
       messages: [
@@ -73,15 +81,38 @@ class OpenAiService{
   }
 
   /// Returns the stream chat completion model with the given id
-  Future<Stream<OpenAIStreamChatCompletionModel>> streamChatCompletion(String prompt,String model)async{
-    return OpenAI.instance.chat.createStream(
-      model: model,
-      messages: [
+  static Future<Stream<OpenAIStreamChatCompletionModel>> streamChatCompletion(
+      String prompt, String model) async {
+    return OpenAI.instance.chat.createStream(model: model, messages: [
+      OpenAIChatCompletionChoiceMessageModel(
+        content: prompt,
+        role: OpenAIChatMessageRole.user,
+      )
+    ]);
+  }
+
+  /// Returns the stream chat completion model with the given id
+  static Future<Stream<OpenAIStreamChatCompletionModel>?>
+      streamChatCompletionWithHistory(
+          String prompt,
+          String model,
+          List<OpenAIChatCompletionChoiceMessageModel>
+              currentChatHistory) async {
+    try {
+      // Add the new user message to the provided chat history
+      currentChatHistory.add(
         OpenAIChatCompletionChoiceMessageModel(
           content: prompt,
           role: OpenAIChatMessageRole.user,
-        )
-      ]
-    );
+        ),
+      );
+      var stream = OpenAI.instance.chat
+          .createStream(model: model, messages: currentChatHistory);
+
+      return stream;
+    } on RequestFailedException catch (e) {
+      Get.snackbar('Error', e.message);
+    }
+    return null;
   }
 }
