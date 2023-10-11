@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:syncia/controllers/theme_controller.dart';
 import 'package:syncia/widgets/markdown_response_tile.dart';
 
-class QueryTile extends StatefulWidget {
+class QueryTile extends StatelessWidget {
   const QueryTile(
       {Key? key,
       required this.isLast,
@@ -17,13 +16,6 @@ class QueryTile extends StatefulWidget {
   final bool isRead;
   final String query;
   final String response;
-
-  @override
-  State<QueryTile> createState() => _QueryTileState();
-}
-
-class _QueryTileState extends State<QueryTile> {
-  bool _showFormatted = false;
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +36,7 @@ class _QueryTileState extends State<QueryTile> {
                         child: Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: SelectableText(
-                        widget.query,
+                        query,
                         style: const TextStyle(
                             fontSize: 17.0, fontWeight: FontWeight.normal),
                       ),
@@ -55,8 +47,14 @@ class _QueryTileState extends State<QueryTile> {
                           color: Colors.blue,
                           tooltip: 'copy response',
                           onPressed: () {
-                            Clipboard.setData(ClipboardData(text: widget.response));
-                          }, icon: Obx(() => Icon(Icons.copy,color: ThemeController.to.isDarkTheme.value ? Colors.white : Colors.black,))),
+                            Clipboard.setData(ClipboardData(text: response));
+                          },
+                          icon: Obx(() => Icon(
+                                Icons.copy,
+                                color: ThemeController.to.isDarkTheme.value
+                                    ? Colors.white
+                                    : Colors.black,
+                              ))),
                     )
                   ],
                 )
@@ -67,20 +65,7 @@ class _QueryTileState extends State<QueryTile> {
         ListTile(
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-          title: widget.isLast &&
-                  !widget.isRead && !_showFormatted// Check if it's the latest response
-              ? AnimatedTextKit(
-                  animatedTexts: [
-                    TypewriterAnimatedText(widget.response),
-                  ],
-                  totalRepeatCount: 1,
-            onFinished: (){
-              setState(() {
-                _showFormatted = true;
-              });
-            },
-                )
-              : MarkdownResponseTile(response: widget.response),
+          title: MarkdownResponseTile(response: response),
         ),
       ],
     );
