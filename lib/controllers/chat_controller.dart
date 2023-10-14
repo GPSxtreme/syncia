@@ -21,6 +21,7 @@ class ChatController extends GetxController {
   final RxInt characterCount = 0.obs;
   final RxBool showScrollToTopBtn = false.obs;
   final RxBool showScrollToBottomBtn = false.obs;
+  final RxBool isInit = false.obs;
 
   ChatController(
       {required this.roomId, this.isNew = false, required this.modelId}) {
@@ -34,15 +35,13 @@ class ChatController extends GetxController {
     await _loadInitialMessages();
     // This ensures that the ListView scrolls to the bottom when new messages are added.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (scrollController.hasClients) {
-        scrollController.jumpTo(scrollController.position.maxScrollExtent);
-      }
+      scrollController.jumpTo(scrollController.position.maxScrollExtent);
     });
   }
 
   Future<void> _loadInitialMessages() async {
     // Fetching the most recent 20 messages
-    final messages = await databaseService.getChatMessages(roomId, limit: 20);
+    final messages = await databaseService.getChatMessages(roomId, limit: 5);
     // Reversing the list so the latest message is at the bottom
     chatMessages.addAll(messages.toList());
   }
@@ -52,23 +51,20 @@ class ChatController extends GetxController {
     final double currentOffset = scrollController.position.pixels;
 
     // Calculate the thresholds based on percentages
-    final double topThreshold = totalExtent * 0.15; // 15% from the top
-    final double bottomThreshold = totalExtent * 0.85; // 85% from the bottom
+    final double topThreshold = totalExtent * 0.20; // x% from the top
+    final double bottomThreshold = totalExtent * 0.85; // y% from the bottom
     if (scrollController.hasClients) {
       if (currentOffset <= topThreshold) {
         // The user is in the top 20% of the list
         showScrollToTopBtn.value = false;
         showScrollToBottomBtn.value = true;
-        if (scrollController.position.atEdge &&
-            scrollController.position.pixels == 0) {
-          _loadAndPositionMessages(); // Load more messages when at the top
-        }
+        _loadOlderMessages();
       } else if (currentOffset >= bottomThreshold) {
-        // The user is in the bottom 15% of the list
+        // The user is in the bottom x% of the list
         showScrollToTopBtn.value = true;
         showScrollToBottomBtn.value = false;
       } else {
-        // The user is somewhere in between the top 15% and bottom 15%
+        // The user is somewhere in between the top x% and bottom y%
         showScrollToTopBtn.value = true;
         showScrollToBottomBtn.value = true;
       }
@@ -78,27 +74,13 @@ class ChatController extends GetxController {
     }
   }
 
-  Future<void> _loadAndPositionMessages() async {
-    double previousScrollHeight = scrollController.position.maxScrollExtent;
-
-    await _loadOlderMessages();
-
-    double newScrollHeight = scrollController.position.maxScrollExtent;
-
-    // This will keep the scroll position right at the top of the newly loaded messages.
-    scrollController.jumpTo(
-        scrollController.offset + (newScrollHeight - previousScrollHeight));
-  }
-
   Future<void> _loadOlderMessages() async {
     final olderMessages = await databaseService.getChatMessages(roomId,
-        end: chatMessages.length, limit: 20);
-
+        end: chatMessages.length, limit: 1);
     // Check if there are no more older messages
     if (olderMessages.isEmpty) {
       return;
     }
-
     chatMessages.insertAll(0, olderMessages);
   }
 
@@ -161,7 +143,7 @@ class ChatController extends GetxController {
               read: false);
 
           addOrUpdateMessage(message);
-          scrollToBottom(addDelay: false);
+          scrollToBottom(addDelay: true, delay: 250);
         }, onDone: () {
           if (id != null) {
             ChatMessage finalMessage = ChatMessage(
@@ -198,18 +180,26 @@ class ChatController extends GetxController {
     update();
   }
 
-  Future<void> scrollToBottom({bool addDelay = true}) async {
+  Future<void> scrollToBottom(
+      {bool addDelay = true, int delay = 200, bool useAnimation = true}) async {
     // Wait for the animation to complete
     if (addDelay) {
-      await Future.delayed(const Duration(milliseconds: 200));
+      await Future.delayed(Duration(milliseconds: delay));
     }
+    // hey modify logic in this if.
     if (scrollController.hasClients) {
       // Scroll to the bottom
-      scrollController.animateTo(
-        scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
+      if (useAnimation) {
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      } else {
+        scrollController.jumpTo(
+          scrollController.position.maxScrollExtent,
+        );
+      }
     }
   }
 
