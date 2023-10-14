@@ -22,6 +22,7 @@ class ChatController extends GetxController {
   final RxBool showScrollToTopBtn = false.obs;
   final RxBool showScrollToBottomBtn = false.obs;
   final RxBool isInit = false.obs;
+  final RxBool isFetchingOldChat = false.obs;
 
   ChatController(
       {required this.roomId, this.isNew = false, required this.modelId}) {
@@ -35,7 +36,9 @@ class ChatController extends GetxController {
     await _loadInitialMessages();
     // This ensures that the ListView scrolls to the bottom when new messages are added.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      scrollController.jumpTo(scrollController.position.maxScrollExtent);
+      if (scrollController.hasClients) {
+        scrollController.jumpTo(scrollController.position.maxScrollExtent);
+      }
     });
   }
 
@@ -55,10 +58,13 @@ class ChatController extends GetxController {
     final double bottomThreshold = totalExtent * 0.85; // y% from the bottom
     if (scrollController.hasClients) {
       if (currentOffset <= topThreshold) {
-        // The user is in the top 20% of the list
+        // The user is in the top x% of the list
         showScrollToTopBtn.value = false;
         showScrollToBottomBtn.value = true;
-        _loadOlderMessages();
+        if (currentOffset == 0) {
+          isFetchingOldChat.value = true;
+          _loadOlderMessages().then((_) => isFetchingOldChat.value = false);
+        }
       } else if (currentOffset >= bottomThreshold) {
         // The user is in the bottom x% of the list
         showScrollToTopBtn.value = true;
@@ -76,11 +82,13 @@ class ChatController extends GetxController {
 
   Future<void> _loadOlderMessages() async {
     final olderMessages = await databaseService.getChatMessages(roomId,
-        end: chatMessages.length, limit: 1);
+        end: chatMessages.length, limit: 5);
+
     // Check if there are no more older messages
     if (olderMessages.isEmpty) {
       return;
     }
+
     chatMessages.insertAll(0, olderMessages);
   }
 
