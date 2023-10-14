@@ -1,13 +1,16 @@
-import 'package:animated_text_kit/animated_text_kit.dart';
+// ignore_for_file: library_prefixes
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_highlight/flutter_highlight.dart';
+import 'package:flutter_highlight/themes/gruvbox-dark.dart' as syntaxDarkTheme;
+import 'package:flutter_highlight/themes/lightfair.dart' as syntaxLightTheme;
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:markdown/markdown.dart' as md;
 
 import '../controllers/theme_controller.dart';
-
 
 class MarkdownResponseTile extends StatelessWidget {
   final String response;
@@ -34,9 +37,7 @@ class MarkdownResponseTile extends StatelessWidget {
         ),
       ),
     );
-
   }
-
 }
 
 class CodeBlockBuilder extends MarkdownElementBuilder {
@@ -48,20 +49,27 @@ class CodeBlockBuilder extends MarkdownElementBuilder {
 
   @override
   Widget? visitElementAfterWithContext(
-      BuildContext context,
-      md.Element element,
-      TextStyle? preferredStyle,
-      TextStyle? parentStyle,
-      ) {
+    BuildContext context,
+    md.Element element,
+    TextStyle? preferredStyle,
+    TextStyle? parentStyle,
+  ) {
     if (element.tag == "code") {
       String? language = element.attributes['class']?.split('-').last;
       language ??= "Code Block";
       if (element.textContent.contains('\n')) {
         // Assume this is a block-level code element.
-        return Obx((){
-          final containerHeadingBackgroundColor = ThemeController.to.isDarkTheme.value ? HexColor('#212121') : Colors.grey[200];
-          final containerBackgroundColor = ThemeController.to.isDarkTheme.value ? HexColor('#333333') : Colors.grey[200];
-          final headingIconColor = ThemeController.to.isDarkTheme.value ? Colors.white : Colors.black;
+        return Obx(() {
+          final containerHeadingBackgroundColor =
+              ThemeController.to.isDarkTheme.value
+                  ? HexColor('#212121')
+                  : Colors.grey[200];
+          final containerBackgroundColor = ThemeController.to.isDarkTheme.value
+              ? HexColor('#333333')
+              : Colors.grey[200];
+          final headingIconColor = ThemeController.to.isDarkTheme.value
+              ? Colors.white
+              : Colors.black;
           return Container(
             margin: const EdgeInsets.symmetric(vertical: 0),
             decoration: BoxDecoration(
@@ -81,21 +89,20 @@ class CodeBlockBuilder extends MarkdownElementBuilder {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      AnimatedTextKit(
-                        animatedTexts: [
-                          TypewriterAnimatedText(
-                            language!,
-                            textStyle: const TextStyle(
-                              fontSize: 17.0,
-                            ),
-                          ),
-                        ],
-                        totalRepeatCount: 1,
+                      Text(
+                        language!,
+                        style: const TextStyle(
+                          fontSize: 17.0,
+                        ),
                       ),
                       IconButton(
                         onPressed: () {
                           Clipboard.setData(
                               ClipboardData(text: element.textContent));
+                          Get.snackbar('Added to clipboard', 'Code copied',
+                              icon: const Icon(Icons.check),
+                              duration: const Duration(seconds: 2),
+                              snackPosition: SnackPosition.BOTTOM);
                         },
                         icon: Icon(
                           Icons.copy,
@@ -105,12 +112,18 @@ class CodeBlockBuilder extends MarkdownElementBuilder {
                     ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                  child: SelectableText(
-                    element.textContent,
-                    style: const TextStyle(fontSize: 16.0, fontFamily: 'Courier New'),
-                  ),
+                HighlightView(
+                  element.textContent,
+                  language: language == "Code Block" ? "plaintext" : language,
+                  theme: ThemeController.to.isDarkTheme.value
+                      ? syntaxDarkTheme.gruvboxDarkTheme
+                      : syntaxLightTheme.lightfairTheme,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  textStyle: const TextStyle(
+                      fontSize: 16.0,
+                      fontFamily: 'Courier New',
+                      fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -118,11 +131,13 @@ class CodeBlockBuilder extends MarkdownElementBuilder {
         });
       } else {
         // This is likely an inline code element.
-        return Obx((){
+        return Obx(() {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
             child: Container(
-              color: ThemeController.to.isDarkTheme.value ? HexColor('#333333') : Colors.grey[200],
+              color: ThemeController.to.isDarkTheme.value
+                  ? HexColor('#333333')
+                  : Colors.grey[200],
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               child: SelectableText(
                 element.textContent,
@@ -139,5 +154,3 @@ class CodeBlockBuilder extends MarkdownElementBuilder {
     return null;
   }
 }
-
-
