@@ -1,7 +1,6 @@
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:syncia/controllers/home_controller.dart';
+import 'package:syncia/controllers/chats_controller.dart';
 import 'package:syncia/models/chat_room_data.dart';
 import 'package:get/get.dart';
 
@@ -13,16 +12,9 @@ class TextChatRoomTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: AnimatedTextKit(
-        isRepeatingAnimation: false,
-        totalRepeatCount: 1,
-        animatedTexts: [
-          TypewriterAnimatedText(
-            chatRoomData.name,
-            speed: const Duration(milliseconds: 100),
-            textStyle: const TextStyle(fontSize: 15),
-          )
-        ],
+      title: Text(
+        chatRoomData.name,
+        style: const TextStyle(fontSize: 15),
       ),
       onTap: () {
         // go to text chat page
@@ -37,7 +29,7 @@ class TextChatRoomTile extends StatelessWidget {
       ),
       trailing: IconButton(
         onPressed: () async {
-          await HomeController.to.deleteChatRoom(chatRoomData.id);
+          await ChatsController.to.deleteChatRoom(chatRoomData.id);
         },
         icon: const Icon(
           Icons.delete,
