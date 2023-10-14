@@ -53,18 +53,7 @@ class _TextChatPageState extends State<TextChatPage> {
                           final chatMessage = controller.chatMessages[index];
                           final query = chatMessage.query;
                           final response = chatMessage.response;
-
-                          // Since the list is reversed, index 0 represents the latest message.
-                          bool isLast =
-                              index == controller.chatMessages.length - 1;
-                          bool isRead = chatMessage.read;
-
-                          if (!isRead) {
-                            chatMessage.setRead(true);
-                          }
                           return QueryTile(
-                            isLast: isLast,
-                            isRead: isRead,
                             query: query,
                             response: response,
                           );
