@@ -5,15 +5,8 @@ import 'package:syncia/controllers/theme_controller.dart';
 import 'package:syncia/widgets/markdown_response_tile.dart';
 
 class QueryTile extends StatelessWidget {
-  const QueryTile(
-      {Key? key,
-      required this.isLast,
-      required this.isRead,
-      required this.query,
-      required this.response})
+  const QueryTile({Key? key, required this.query, required this.response})
       : super(key: key);
-  final bool isLast;
-  final bool isRead;
   final String query;
   final String response;
 
