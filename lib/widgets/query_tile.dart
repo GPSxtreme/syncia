@@ -41,21 +41,47 @@ class QueryTile extends StatelessWidget {
                             fontSize: 17.0, fontWeight: FontWeight.normal),
                       ),
                     )),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: IconButton(
-                          color: Colors.blue,
-                          tooltip: 'copy response',
-                          onPressed: () {
-                            Clipboard.setData(ClipboardData(text: response));
-                          },
-                          icon: Obx(() => Icon(
-                                Icons.copy,
-                                color: ThemeController.to.isDarkTheme.value
-                                    ? Colors.white
-                                    : Colors.black,
-                              ))),
-                    )
+                    PopupMenuButton<String>(
+                      padding: EdgeInsets.zero,
+                      onSelected: (String result) {
+                        if (result == 'copy') {
+                          Clipboard.setData(ClipboardData(text: response));
+                          Get.snackbar('Added to clipboard', 'Response copied',
+                              icon: const Icon(Icons.check),
+                              duration: const Duration(seconds: 2),
+                              snackPosition: SnackPosition.BOTTOM);
+                        } else if (result == 'save') {
+                          // Implement your logic for save
+                        }
+                      },
+                      itemBuilder: (BuildContext context) =>
+                          <PopupMenuEntry<String>>[
+                        PopupMenuItem<String>(
+                          value: 'copy',
+                          child: ListTile(
+                            leading: Obx(() => Icon(
+                                  Icons.copy,
+                                  color: ThemeController.to.isDarkTheme.value
+                                      ? Colors.white
+                                      : Colors.black,
+                                )),
+                            title: const Text('Copy Response'),
+                          ),
+                        ),
+                        PopupMenuItem<String>(
+                          value: 'save',
+                          child: ListTile(
+                            leading: Obx(() => Icon(
+                                  Icons.bookmark_outline,
+                                  color: ThemeController.to.isDarkTheme.value
+                                      ? Colors.white
+                                      : Colors.black,
+                                )),
+                            title: const Text('Save'),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 )
               ],
