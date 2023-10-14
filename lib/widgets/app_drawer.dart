@@ -74,8 +74,8 @@ class AppDrawer extends StatelessWidget {
               leading: const Icon(Icons.bookmark),
               title: const Text('Saved'),
               onTap: () {
-                Get.currentRoute != Routes.savedPage
-                    ? Get.offAndToNamed(Routes.savedPage)
+                Get.currentRoute != Routes.savedCollectionsPage
+                    ? Get.offAndToNamed(Routes.savedCollectionsPage)
                     : Get.back();
               },
             ),
