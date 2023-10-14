@@ -18,11 +18,11 @@ class ChatMessage {
       id: map['id']?.toString() ?? '',
       query: map['query']?.toString() ?? '',
       response: map['response']?.toString() ?? '',
-      read: map['read'] is bool ? map['read'] : false,
-      timestamp: map['timestamp'] is String ? DateTime.parse(map['timestamp']) : DateTime.now(),
+      timestamp: map['timestamp'] is String
+          ? DateTime.parse(map['timestamp'])
+          : DateTime.now(),
     );
   }
-
 
   Map<String, dynamic> toMap() {
     return {
@@ -30,15 +30,11 @@ class ChatMessage {
       'query': query,
       'response': response,
       'timestamp': timestamp.toIso8601String(),
-      'read': read,
     };
-  }
-  void setRead(bool value) {
-    read = value;
   }
 
   @override
   String toString() {
-    return 'ChatMessage{id: $id, query: $query, response: $response, timestamp: $timestamp, read: $read}';
+    return 'ChatMessage{id: $id, query: $query, response: $response, timestamp: $timestamp}';
   }
 }
