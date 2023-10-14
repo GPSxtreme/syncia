@@ -4,6 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:syncia/models/saved_collection_room.dart';
 import '../models/chat_message.dart';
 import '../models/chat_room_data.dart';
 import '../models/chat_room_messages.dart';
@@ -12,6 +13,9 @@ class DatabaseService {
   static const String dbName = 'syncia.db';
   static const String chatRoomsDataStoreName = 'chat_rooms_data';
   static const String chatRoomsMessagesStoreName = 'chat_rooms_messages';
+  static const String savedCollectionRoomsDataStoreName =
+      'saved_collection_rooms';
+  static const String savedMessagesDataStoreName = 'saved_messages';
 
   final DatabaseFactory _databaseFactory = databaseFactoryIo;
   Database? _database;
@@ -80,9 +84,10 @@ class DatabaseService {
       final allMessages =
           chatRoom.messages.map((e) => ChatMessage.fromMap(e)).toList();
 
-      // Determine the start and end indexes for slicing
+      // Ensure startIndex is not negative
       int startIndex = max(0, allMessages.length - end - limit);
-      int endIndex = allMessages.length - end;
+      // Ensure endIndex does not exceed the length of the list and is not negative
+      int endIndex = max(0, min(allMessages.length - end, allMessages.length));
 
       // Slice the list for pagination.
       final messages = allMessages.sublist(startIndex, endIndex);
@@ -124,5 +129,49 @@ class DatabaseService {
       messageStore.delete(db, finder: Finder(filter: Filter.equals('id', id))),
       dataStore.delete(db, finder: Finder(filter: Filter.equals('id', id)))
     ]);
+  }
+
+  Future<void> saveCollectionRoom(SavedCollectionRoom room) async {
+    final db = await database;
+    final store = _store(savedCollectionRoomsDataStoreName);
+    await store.record(room.id).put(db, room.toMap());
+  }
+
+  Future<void> deleteCollectionRoom(int id) async {
+    final db = await database;
+    final store = _store(savedCollectionRoomsDataStoreName);
+    await store.delete(db, finder: Finder(filter: Filter.equals('id', id)));
+  }
+
+  Future<List<SavedCollectionRoom>> getCollectionRooms() async {
+    final db = await database;
+    final store = _store(savedCollectionRoomsDataStoreName);
+    final snapshots = await store.find(db);
+    return snapshots
+        .map((snapshot) => SavedCollectionRoom.fromMap(snapshot.value))
+        .toList();
+  }
+
+  Future<void> bookMarkChatMessage(String roomId, ChatMessage message) async {
+    final db = await database;
+    final store = _store(savedMessagesDataStoreName);
+    await store.add(db, {...message.toMap(), 'collectionRoomId': roomId});
+  }
+
+  Future<List<ChatMessage>> getSavedChatMessages(String roomId) async {
+    final db = await database;
+    final store = _store(savedMessagesDataStoreName);
+    final finder = Finder(filter: Filter.equals('collectionRoomId', roomId));
+    final snapshots = await store.find(db, finder: finder);
+    return snapshots
+        .map((snapshot) => ChatMessage.fromMap(snapshot.value))
+        .toList();
+  }
+
+  Future<void> deleteChatMessage(String messageId) async {
+    final db = await database;
+    final store = _store(savedMessagesDataStoreName);
+    final finder = Finder(filter: Filter.equals('id', messageId));
+    await store.delete(db, finder: finder);
   }
 }
