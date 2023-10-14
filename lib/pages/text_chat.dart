@@ -30,6 +30,11 @@ class _TextChatPageState extends State<TextChatPage> {
         init: ChatController(
             roomId: Get.arguments['roomId'], modelId: Get.arguments['modelId']),
         builder: (controller) {
+          if (!controller.isInit.value) {
+            controller.scrollToBottom(useAnimation: false);
+            controller.isInit.value = true;
+          }
+
           return Stack(
             children: [
               controller.chatMessages.isNotEmpty
