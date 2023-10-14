@@ -7,6 +7,8 @@ import '../services/local_database_service.dart';
 import '../services/open_ai_service.dart';
 
 const int MAX_CHAR = 10000;
+const int INITIAL_MESSAGE_LOAD_COUNT = 10;
+const int OLD_MESSAGES_FETCH_COUNT = 5;
 
 class ChatController extends GetxController {
   final int roomId;
@@ -44,7 +46,8 @@ class ChatController extends GetxController {
 
   Future<void> _loadInitialMessages() async {
     // Fetching the most recent 20 messages
-    final messages = await databaseService.getChatMessages(roomId, limit: 5);
+    final messages = await databaseService.getChatMessages(roomId,
+        limit: INITIAL_MESSAGE_LOAD_COUNT);
     // Reversing the list so the latest message is at the bottom
     chatMessages.addAll(messages.toList());
   }
@@ -82,7 +85,7 @@ class ChatController extends GetxController {
 
   Future<void> _loadOlderMessages() async {
     final olderMessages = await databaseService.getChatMessages(roomId,
-        end: chatMessages.length, limit: 5);
+        end: chatMessages.length, limit: OLD_MESSAGES_FETCH_COUNT);
 
     // Check if there are no more older messages
     if (olderMessages.isEmpty) {
