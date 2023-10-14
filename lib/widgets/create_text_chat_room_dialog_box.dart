@@ -6,7 +6,7 @@ import 'package:syncia/services/open_ai_service.dart';
 import 'package:syncia/styles/size_config.dart';
 import 'package:get/get.dart';
 
-import '../controllers/home_controller.dart';
+import '../controllers/chats_controller.dart';
 
 class CreateTextChatRoomDialogBox extends StatelessWidget {
   CreateTextChatRoomDialogBox({super.key});
@@ -61,7 +61,7 @@ class CreateTextChatRoomDialogBox extends StatelessWidget {
                   onPressed: () async {
                     if (_nameController.text.isNotEmpty &&
                         selectedModel.isNotEmpty) {
-                      await HomeController.to.createTextChatRoom(
+                      await ChatsController.to.createTextChatRoom(
                           _nameController.text.trim(), selectedModel.value);
                     } else {
                       Get.snackbar('Error', 'Room name cannot be empty!');
