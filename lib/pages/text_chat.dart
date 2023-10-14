@@ -54,6 +54,7 @@ class _TextChatPageState extends State<TextChatPage> {
                           final query = chatMessage.query;
                           final response = chatMessage.response;
                           return QueryTile(
+                            key: ValueKey(chatMessage.id),
                             query: query,
                             response: response,
                           );
