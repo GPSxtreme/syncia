@@ -1,17 +1,88 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:syncia/controllers/chat_controller.dart';
+import 'package:syncia/controllers/saved_collections_controller.dart';
 import 'package:syncia/controllers/theme_controller.dart';
+import 'package:syncia/models/chat_message.dart';
+import 'package:syncia/styles/size_config.dart';
 import 'package:syncia/widgets/markdown_response_tile.dart';
+import 'create_collection_dialog_box.dart';
 
 class QueryTile extends StatelessWidget {
-  const QueryTile({Key? key, required this.query, required this.response})
-      : super(key: key);
-  final String query;
-  final String response;
+  const QueryTile({Key? key, required this.chatMessage}) : super(key: key);
+  final ChatMessage chatMessage;
+  _showModalBottomSheet(BuildContext context) => showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      builder: (context) {
+        return GetBuilder<SavedCollectionsController>(
+            init: SavedCollectionsController(),
+            builder: (controller) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (controller.collections.isNotEmpty) ...[
+                    const Text(
+                      'Available collections',
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: controller.collections.length,
+                        itemBuilder: (context, index) {
+                          final collection = controller.collections[index];
+                          return ListTile(
+                            title: Text(collection.name),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.add),
+                              onPressed: () async {
+                                // add chatMessage to the collection
+                                bool response = await controller
+                                    .saveChatMessageToCollection(
+                                        collection.id, chatMessage);
+                                if (response) {
+                                  Get.back();
+                                  Get.snackbar("Success",
+                                      "Saved to ${collection.name} collection");
+                                }
+                              },
+                            ),
+                          );
+                        })
+                  ] else
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 30),
+                        child: Text('No saved collections available'),
+                      ),
+                    ),
+                  ElevatedButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (context) {
+                          return const CreateCollectionDialogBox();
+                        },
+                      );
+                    },
+                    child: const Text(
+                      'Create new collection',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  )
+                ],
+              );
+            });
+      });
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -29,22 +100,25 @@ class QueryTile extends StatelessWidget {
                         child: Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: SelectableText(
-                        query,
+                        chatMessage.query,
                         style: const TextStyle(
                             fontSize: 17.0, fontWeight: FontWeight.normal),
                       ),
                     )),
                     PopupMenuButton<String>(
                       padding: EdgeInsets.zero,
-                      onSelected: (String result) {
+                      onSelected: (String result) async {
                         if (result == 'copy') {
-                          Clipboard.setData(ClipboardData(text: response));
+                          Clipboard.setData(
+                              ClipboardData(text: chatMessage.response));
                           Get.snackbar('Added to clipboard', 'Response copied',
                               icon: const Icon(Icons.check),
                               duration: const Duration(seconds: 2),
                               snackPosition: SnackPosition.BOTTOM);
                         } else if (result == 'save') {
-                          // Implement your logic for save
+                          _showModalBottomSheet(context);
+                        } else if (result == 'delete') {
+                          await ChatController.to.deleteMessage(chatMessage.id);
                         }
                       },
                       itemBuilder: (BuildContext context) =>
@@ -73,6 +147,18 @@ class QueryTile extends StatelessWidget {
                             title: const Text('Save'),
                           ),
                         ),
+                        PopupMenuItem<String>(
+                          value: 'delete',
+                          child: ListTile(
+                            leading: Obx(() => Icon(
+                                  Icons.delete_outline,
+                                  color: ThemeController.to.isDarkTheme.value
+                                      ? Colors.white
+                                      : Colors.black,
+                                )),
+                            title: const Text('Delete'),
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -84,7 +170,7 @@ class QueryTile extends StatelessWidget {
         ListTile(
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-          title: MarkdownResponseTile(response: response),
+          title: MarkdownResponseTile(response: chatMessage.response),
         ),
       ],
     );
