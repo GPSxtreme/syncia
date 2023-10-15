@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
 import 'package:syncia/controllers/theme_controller.dart';
 import 'package:syncia/services/open_ai_service.dart';
@@ -82,16 +80,16 @@ class CreateTextChatRoomDialogBox extends StatelessWidget {
                 () => TextField(
                     controller: _nameController,
                     decoration: InputDecoration(
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 15),
                         labelText: 'Room Name',
-                        labelStyle: TextStyle(fontSize: 14),
+                        labelStyle: const TextStyle(fontSize: 14),
                         enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
                                 color: ThemeController.to.isDarkTheme.value
                                     ? Colors.white24
                                     : Colors.black26)),
-                        border: OutlineInputBorder(
+                        border: const OutlineInputBorder(
                             borderSide: BorderSide(
                           width: 1,
                         )))),
