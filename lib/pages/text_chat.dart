@@ -34,7 +34,6 @@ class _TextChatPageState extends State<TextChatPage> {
             controller.scrollToBottom(useAnimation: false);
             controller.isInit.value = true;
           }
-
           return Stack(
             children: [
               controller.chatMessages.isNotEmpty
@@ -51,12 +50,9 @@ class _TextChatPageState extends State<TextChatPage> {
                         controller: controller.scrollController,
                         itemBuilder: (context, index) {
                           final chatMessage = controller.chatMessages[index];
-                          final query = chatMessage.query;
-                          final response = chatMessage.response;
                           return QueryTile(
                             key: ValueKey(chatMessage.id),
-                            query: query,
-                            response: response,
+                            chatMessage: chatMessage,
                           );
                         },
                       ),
