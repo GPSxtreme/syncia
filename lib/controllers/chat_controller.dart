@@ -13,21 +13,18 @@ const int OLD_MESSAGES_FETCH_COUNT = 5;
 class ChatController extends GetxController {
   final int roomId;
   final String modelId;
-  final bool isNew;
   static ChatController get to => Get.find();
   RxList<ChatMessage> chatMessages = RxList<ChatMessage>();
   final TextEditingController inputController = TextEditingController();
   final ScrollController scrollController = ScrollController();
+  final RxBool showScrollToTopBtn = false.obs;
+  final RxBool showScrollToBottomBtn = false.obs;
   final DatabaseService databaseService = DatabaseService();
   final RxBool isSendingMessage = false.obs;
   final RxInt characterCount = 0.obs;
-  final RxBool showScrollToTopBtn = false.obs;
-  final RxBool showScrollToBottomBtn = false.obs;
   final RxBool isInit = false.obs;
-  final RxBool isFetchingOldChat = false.obs;
 
-  ChatController(
-      {required this.roomId, this.isNew = false, required this.modelId}) {
+  ChatController({required this.roomId, required this.modelId}) {
     inputController.addListener(_updateCharacterCount);
     scrollController.addListener(_handleScrollEvent);
   }
@@ -65,8 +62,7 @@ class ChatController extends GetxController {
         showScrollToTopBtn.value = false;
         showScrollToBottomBtn.value = true;
         if (currentOffset == 0) {
-          isFetchingOldChat.value = true;
-          _loadOlderMessages().then((_) => isFetchingOldChat.value = false);
+          _loadOlderMessages();
         }
       } else if (currentOffset >= bottomThreshold) {
         // The user is in the bottom x% of the list
@@ -239,5 +235,15 @@ class ChatController extends GetxController {
 
     // Jump to the new scroll position.
     scrollController.jumpTo(newScrollPosition);
+  }
+
+  Future<void> deleteMessage(String messageId) async {
+    try {
+      await databaseService.deleteChatMessage(roomId, messageId).then((_) {
+        chatMessages.removeWhere((m) => m.id == messageId);
+      });
+    } catch (e) {
+      Get.snackbar("Error", "Failed deleting message");
+    }
   }
 }
