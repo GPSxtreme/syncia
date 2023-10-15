@@ -8,6 +8,7 @@ import 'package:syncia/models/saved_collection_room.dart';
 import '../models/chat_message.dart';
 import '../models/chat_room_data.dart';
 import '../models/chat_room_messages.dart';
+import '../models/saved_collection_messages.dart';
 
 class DatabaseService {
   static const String dbName = 'syncia.db';
@@ -31,6 +32,8 @@ class DatabaseService {
 
   StoreRef<int, Map<String, dynamic>> _store(String name) =>
       intMapStoreFactory.store(name);
+
+  /* Operations on text chat rooms */
 
   Future<int> createChatRoom(String name, String modelName) async {
     final dataStore = intMapStoreFactory.store(chatRoomsDataStoreName);
@@ -131,10 +134,28 @@ class DatabaseService {
     ]);
   }
 
-  Future<void> saveCollectionRoom(SavedCollectionRoom room) async {
-    final db = await database;
-    final store = _store(savedCollectionRoomsDataStoreName);
-    await store.record(room.id).put(db, room.toMap());
+  Future<void> deleteChatMessage(int roomId, String messageId) async {
+    _modifyMessages(roomId,
+        (messages) => messages.removeWhere((m) => m['id'] == messageId));
+  }
+
+  /* Operations on collection */
+
+  Future<int> createNewCollection(String collectionName) async {
+    final collectionsStore =
+        intMapStoreFactory.store(savedCollectionRoomsDataStoreName);
+    final savedMessagesStore =
+        intMapStoreFactory.store(savedMessagesDataStoreName);
+    int id = await collectionsStore.generateIntKey(await database);
+    final chatRoom = SavedCollectionRoom(
+      id: id,
+      name: collectionName,
+      createdOn: DateTime.now().toIso8601String(),
+    );
+    await collectionsStore.add(await database, chatRoom.toMap());
+    await savedMessagesStore.add(
+        await database, SavedCollectionMessages(id: id, messages: []).toJson());
+    return id;
   }
 
   Future<void> deleteCollectionRoom(int id) async {
@@ -152,26 +173,65 @@ class DatabaseService {
         .toList();
   }
 
-  Future<void> bookMarkChatMessage(String roomId, ChatMessage message) async {
+  Future<void> _modifyCollectionMessages(
+      int collectionId, Function(List<Map<String, dynamic>>) modify) async {
     final db = await database;
-    final store = _store(savedMessagesDataStoreName);
-    await store.add(db, {...message.toMap(), 'collectionRoomId': roomId});
+    final messageStore = _store(savedMessagesDataStoreName);
+    final snapshot = await messageStore.findFirst(db,
+        finder: Finder(filter: Filter.equals('id', collectionId)));
+
+    if (snapshot == null) {
+      throw Exception('Collection not found');
+    }
+
+    final collection = SavedCollectionMessages.fromJson(snapshot.value);
+    modify(collection.messages);
+    await messageStore.record(snapshot.key).put(db, collection.toJson());
   }
 
-  Future<List<ChatMessage>> getSavedChatMessages(String roomId) async {
-    final db = await database;
-    final store = _store(savedMessagesDataStoreName);
-    final finder = Finder(filter: Filter.equals('collectionRoomId', roomId));
-    final snapshots = await store.find(db, finder: finder);
-    return snapshots
-        .map((snapshot) => ChatMessage.fromMap(snapshot.value))
-        .toList();
+  Future<void> bookMarkChatMessage(
+      int collectionId, ChatMessage message) async {
+    await _modifyCollectionMessages(collectionId, (messages) {
+      if (!messages.any((m) => m['id'] == message.id)) {
+        messages.add(message.toMap());
+      } else {
+        throw Exception('Already added to the collection');
+      }
+    });
   }
 
-  Future<void> deleteChatMessage(String messageId) async {
+  Future<void> deleteBookMarkedChatMessage(
+      int collectionId, String messageId) async {
+    _modifyCollectionMessages(collectionId,
+        (messages) => messages.removeWhere((m) => m['id'] == messageId));
+  }
+
+  Future<List<ChatMessage>> getSavedChatMessages(int roomId,
+      {int end = 0, int limit = 20}) async {
     final db = await database;
-    final store = _store(savedMessagesDataStoreName);
-    final finder = Finder(filter: Filter.equals('id', messageId));
-    await store.delete(db, finder: finder);
+    final messageStore = _store(savedMessagesDataStoreName);
+
+    final finder = Finder(
+      filter: Filter.equals('id', roomId),
+    );
+
+    final snapshot = await messageStore.findFirst(db, finder: finder);
+
+    if (snapshot != null) {
+      final savedCollection = SavedCollectionMessages.fromJson(snapshot.value);
+      final allMessages =
+          savedCollection.messages.map((e) => ChatMessage.fromMap(e)).toList();
+
+      // Ensure startIndex is not negative
+      int startIndex = max(0, allMessages.length - end - limit);
+      // Ensure endIndex does not exceed the length of the list and is not negative
+      int endIndex = max(0, min(allMessages.length - end, allMessages.length));
+
+      // Slice the list for pagination.
+      final messages = allMessages.sublist(startIndex, endIndex);
+      return messages;
+    } else {
+      throw Exception('Collection not found');
+    }
   }
 }
