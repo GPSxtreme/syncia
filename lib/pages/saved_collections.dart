@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:syncia/controllers/saved_collections_controller.dart';
 import 'package:syncia/widgets/app_drawer.dart';
 import 'package:get/get.dart';
+import 'package:syncia/widgets/create_collection_dialog_box.dart';
+import 'package:syncia/widgets/saved_collection_tile.dart';
 import '../controllers/theme_controller.dart';
 
 class SavedCollectionsPage extends StatelessWidget {
@@ -23,7 +25,13 @@ class SavedCollectionsPage extends StatelessWidget {
                     : Colors.white,
                 size: 40,
               )),
-          onPressed: () {}),
+          onPressed: () => showDialog(
+                context: context,
+                barrierDismissible: true,
+                builder: (context) {
+                  return const CreateCollectionDialogBox();
+                },
+              )),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -38,9 +46,8 @@ class SavedCollectionsPage extends StatelessWidget {
                     shrinkWrap: true,
                     itemCount: controller.collections.length,
                     itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(controller.collections[index].name),
-                      );
+                      final collection = controller.collections[index];
+                      return SavedCollectionTile(collection: collection);
                     },
                   ),
                 );
