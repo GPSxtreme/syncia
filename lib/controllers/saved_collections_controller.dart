@@ -42,9 +42,7 @@ class SavedCollectionsController extends GetxController {
       await databaseService.bookMarkChatMessage(collectionId, message);
       return true;
     } catch (e) {
-      // remove the word Exception: from the e
-      String msg = e.toString().replaceAll('Exception: ', '');
-      Get.snackbar('Error', msg);
+      Get.snackbar('Error', e.toString());
       return false;
     }
   }
