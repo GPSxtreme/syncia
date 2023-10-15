@@ -18,10 +18,7 @@ class TextChatRoomTile extends StatelessWidget {
       ),
       onTap: () {
         // go to text chat page
-        Get.toNamed(Routes.textChatPage, arguments: {
-          'roomId': chatRoomData.id,
-          'modelId': chatRoomData.modelName,
-        });
+        Get.toNamed(Routes.textChatPage, arguments: chatRoomData.toMap());
       },
       subtitle: Text(
         'Created on : ${DateFormat('d MMMM, h:mm a').format(DateTime.parse(chatRoomData.createdOn).toLocal())}',
