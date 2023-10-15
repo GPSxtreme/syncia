@@ -5,6 +5,7 @@ import 'package:syncia/controllers/chat_controller.dart';
 import 'package:syncia/controllers/saved_collections_controller.dart';
 import 'package:syncia/controllers/theme_controller.dart';
 import 'package:syncia/models/chat_message.dart';
+import 'package:syncia/route.dart';
 import 'package:syncia/styles/size_config.dart';
 import 'package:syncia/widgets/markdown_response_tile.dart';
 import 'create_collection_dialog_box.dart';
@@ -44,7 +45,11 @@ class QueryTile extends StatelessWidget {
                                 if (response) {
                                   Get.back();
                                   Get.snackbar("Success",
-                                      "Saved to ${collection.name} collection");
+                                      "Saved to ${collection.name} collection",
+                                      onTap: (_) {
+                                    Get.toNamed(Routes.savedCollectionPage,
+                                        arguments: collection.toMap());
+                                  });
                                 }
                               },
                             ),
