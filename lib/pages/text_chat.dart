@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:syncia/controllers/chat_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:syncia/models/chat_room_data.dart';
 import 'package:syncia/widgets/query_tile.dart';
 import 'package:syncia/widgets/text_chat_textfield.dart';
 
@@ -16,6 +17,7 @@ class TextChatPage extends StatefulWidget {
 }
 
 class _TextChatPageState extends State<TextChatPage> {
+  final ChatRoomData chatRoomData = ChatRoomData.fromMap(Get.arguments);
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
@@ -23,12 +25,12 @@ class _TextChatPageState extends State<TextChatPage> {
       appBar: AppBar(
         elevation: 0.5,
         centerTitle: true,
-        title: Text(Get.arguments['modelId']),
+        title: Text(chatRoomData.modelName),
       ),
       body: GetX<ChatController>(
         assignId: true,
         init: ChatController(
-            roomId: Get.arguments['roomId'], modelId: Get.arguments['modelId']),
+            roomId: chatRoomData.id, modelId: chatRoomData.modelName),
         builder: (controller) {
           if (!controller.isInit.value) {
             controller.scrollToBottom(useAnimation: false);
