@@ -4,6 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:syncia/errors/exception_message.dart';
 import 'package:syncia/models/saved_collection_room.dart';
 import '../models/chat_message.dart';
 import '../models/chat_room_data.dart';
@@ -195,7 +196,7 @@ class DatabaseService {
       if (!messages.any((m) => m['id'] == message.id)) {
         messages.add(message.toMap());
       } else {
-        throw Exception('Already added to the collection');
+        throw ExceptionMessage('Already added to the collection');
       }
     });
   }
@@ -229,6 +230,7 @@ class DatabaseService {
 
       // Slice the list for pagination.
       final messages = allMessages.sublist(startIndex, endIndex);
+
       return messages;
     } else {
       throw Exception('Collection not found');
