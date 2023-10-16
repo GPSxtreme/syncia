@@ -67,6 +67,41 @@ class ImageChatTextField extends StatelessWidget {
                               ? Colors.red
                               : null),
                     )),
+                const SizedBox(
+                  width: 8,
+                ),
+                Row(
+                  children: [
+                    // "-" Button
+                    IconButton(
+                      onPressed: () {
+                        if (controller.genImgCount > 1) {
+                          controller.genImgCount.value--;
+                        }
+                      },
+                      icon: const Icon(Icons.remove),
+                    ),
+
+                    // Image Count Display
+                    Obx(
+                      () => Text(
+                        controller.genImgCount.value.toString(),
+                        style:
+                            const TextStyle(fontSize: 18.0, color: Colors.blue),
+                      ),
+                    ),
+
+                    // "+" Button
+                    IconButton(
+                      onPressed: () {
+                        if (controller.genImgCount < 4) {
+                          controller.genImgCount.value++;
+                        }
+                      },
+                      icon: const Icon(Icons.add),
+                    ),
+                  ],
+                ),
                 const Spacer(),
                 Obx(() => ElevatedButton(
                       style: ElevatedButton.styleFrom(
