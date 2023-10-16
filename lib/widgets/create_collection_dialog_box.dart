@@ -8,6 +8,7 @@ class CreateCollectionDialogBox extends StatelessWidget {
   const CreateCollectionDialogBox({super.key});
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
     final nameController = TextEditingController();
     return AlertDialog(
       shape: const RoundedRectangleBorder(
