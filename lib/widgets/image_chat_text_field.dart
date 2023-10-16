@@ -45,7 +45,7 @@ class ImageChatTextField extends StatelessWidget {
                       minLines: 1,
                       maxLines: 8,
                       decoration: InputDecoration(
-                        hintText: "Type your message here..",
+                        hintText: "Type your prompt here..",
                         hintStyle: TextStyle(color: hintTextColor),
                         border: InputBorder.none,
                       ),
