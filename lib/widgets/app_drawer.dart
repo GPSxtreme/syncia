@@ -53,7 +53,34 @@ class AppDrawer extends StatelessWidget {
               title: const Text('Text chats'),
               onTap: () {
                 Get.currentRoute != Routes.textChatsPage
-                    ? Get.offAndToNamed(Routes.textChatsPage)
+                    ? Get.offAllNamed(Routes.textChatsPage)
+                    : Get.back();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo),
+              title: const Text('Image chats'),
+              onTap: () {
+                Get.currentRoute != Routes.imageChatsPage
+                    ? Get.offAllNamed(Routes.imageChatsPage)
+                    : Get.back();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.bookmark),
+              title: const Text('Saved'),
+              onTap: () {
+                Get.currentRoute != Routes.savedCollectionsPage
+                    ? Get.offAllNamed(Routes.savedCollectionsPage)
+                    : Get.back();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Settings'),
+              onTap: () {
+                Get.currentRoute != Routes.settingsPage
+                    ? Get.offAllNamed(Routes.settingsPage)
                     : Get.back();
               },
             ),
@@ -70,24 +97,6 @@ class AppDrawer extends StatelessWidget {
                             Get.find<ThemeController>().toggleTheme(),
                       )),
                 )),
-            ListTile(
-              leading: const Icon(Icons.bookmark),
-              title: const Text('Saved'),
-              onTap: () {
-                Get.currentRoute != Routes.savedCollectionsPage
-                    ? Get.offAndToNamed(Routes.savedCollectionsPage)
-                    : Get.back();
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Settings'),
-              onTap: () {
-                Get.currentRoute != Routes.settingsPage
-                    ? Get.offAndToNamed(Routes.settingsPage)
-                    : Get.back();
-              },
-            ),
           ],
         ),
       ),
