@@ -1,5 +1,6 @@
 import 'package:dart_openai/dart_openai.dart';
-import 'package:get/get.dart';
+import 'package:flutter/foundation.dart';
+import 'package:syncia/errors/exception_message.dart';
 
 class OpenAiService {
   static List<OpenAIModelModel> models = [];
@@ -59,9 +60,11 @@ class OpenAiService {
 
       return response;
     } on RequestFailedException catch (e) {
-      Get.snackbar('Error', e.message);
+      if (kDebugMode) {
+        print(e);
+      }
+      throw ExceptionMessage('Error fetching response');
     }
-    return null;
   }
 
   /// Returns the chat completion model with the given prompt
@@ -111,8 +114,22 @@ class OpenAiService {
 
       return stream;
     } on RequestFailedException catch (e) {
-      Get.snackbar('Error', e.message);
+      if (kDebugMode) {
+        print(e);
+      }
+      throw ExceptionMessage("Error fetching response");
     }
-    return null;
+  }
+
+  /// Generates based on the given [prompt]
+  /// [count] defines the number of images to be generated
+  static Future<OpenAIImageModel> generateImageOnPrompt(String prompt,
+      {int count = 1}) async {
+    return await OpenAI.instance.image.create(
+      prompt: prompt,
+      n: count,
+      size: OpenAIImageSize.size1024,
+      responseFormat: OpenAIImageResponseFormat.url,
+    );
   }
 }
