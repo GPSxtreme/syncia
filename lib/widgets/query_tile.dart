@@ -97,77 +97,73 @@ class QueryTile extends StatelessWidget {
             decoration: const BoxDecoration(
                 border:
                     Border(left: BorderSide(color: Colors.blue, width: 3.0))),
-            child: Column(
+            child: Row(
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                        child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: SelectableText(
-                        chatMessage.query,
-                        style: const TextStyle(
-                            fontSize: 17.0, fontWeight: FontWeight.normal),
+                Expanded(
+                    child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: SelectableText(
+                    chatMessage.query,
+                    style: const TextStyle(
+                        fontSize: 17.0, fontWeight: FontWeight.normal),
+                  ),
+                )),
+                PopupMenuButton<String>(
+                  padding: EdgeInsets.zero,
+                  onSelected: (String result) async {
+                    if (result == 'copy') {
+                      Clipboard.setData(
+                          ClipboardData(text: chatMessage.response));
+                      Get.snackbar('Added to clipboard', 'Response copied',
+                          icon: const Icon(Icons.check),
+                          duration: const Duration(seconds: 2),
+                          snackPosition: SnackPosition.BOTTOM);
+                    } else if (result == 'save') {
+                      _showModalBottomSheet(context);
+                    } else if (result == 'delete') {
+                      await ChatController.to.deleteMessage(chatMessage.id);
+                    }
+                  },
+                  itemBuilder: (BuildContext context) =>
+                      <PopupMenuEntry<String>>[
+                    PopupMenuItem<String>(
+                      value: 'copy',
+                      child: ListTile(
+                        leading: Obx(() => Icon(
+                              Icons.copy,
+                              color: ThemeController.to.isDarkTheme.value
+                                  ? Colors.white
+                                  : Colors.black,
+                            )),
+                        title: const Text('Copy Response'),
                       ),
-                    )),
-                    PopupMenuButton<String>(
-                      padding: EdgeInsets.zero,
-                      onSelected: (String result) async {
-                        if (result == 'copy') {
-                          Clipboard.setData(
-                              ClipboardData(text: chatMessage.response));
-                          Get.snackbar('Added to clipboard', 'Response copied',
-                              icon: const Icon(Icons.check),
-                              duration: const Duration(seconds: 2),
-                              snackPosition: SnackPosition.BOTTOM);
-                        } else if (result == 'save') {
-                          _showModalBottomSheet(context);
-                        } else if (result == 'delete') {
-                          await ChatController.to.deleteMessage(chatMessage.id);
-                        }
-                      },
-                      itemBuilder: (BuildContext context) =>
-                          <PopupMenuEntry<String>>[
-                        PopupMenuItem<String>(
-                          value: 'copy',
-                          child: ListTile(
-                            leading: Obx(() => Icon(
-                                  Icons.copy,
-                                  color: ThemeController.to.isDarkTheme.value
-                                      ? Colors.white
-                                      : Colors.black,
-                                )),
-                            title: const Text('Copy Response'),
-                          ),
-                        ),
-                        PopupMenuItem<String>(
-                          value: 'save',
-                          child: ListTile(
-                            leading: Obx(() => Icon(
-                                  Icons.bookmark_outline,
-                                  color: ThemeController.to.isDarkTheme.value
-                                      ? Colors.white
-                                      : Colors.black,
-                                )),
-                            title: const Text('Save'),
-                          ),
-                        ),
-                        PopupMenuItem<String>(
-                          value: 'delete',
-                          child: ListTile(
-                            leading: Obx(() => Icon(
-                                  Icons.delete_outline,
-                                  color: ThemeController.to.isDarkTheme.value
-                                      ? Colors.white
-                                      : Colors.black,
-                                )),
-                            title: const Text('Delete'),
-                          ),
-                        ),
-                      ],
+                    ),
+                    PopupMenuItem<String>(
+                      value: 'save',
+                      child: ListTile(
+                        leading: Obx(() => Icon(
+                              Icons.bookmark_outline,
+                              color: ThemeController.to.isDarkTheme.value
+                                  ? Colors.white
+                                  : Colors.black,
+                            )),
+                        title: const Text('Save'),
+                      ),
+                    ),
+                    PopupMenuItem<String>(
+                      value: 'delete',
+                      child: ListTile(
+                        leading: Obx(() => Icon(
+                              Icons.delete_outline,
+                              color: ThemeController.to.isDarkTheme.value
+                                  ? Colors.white
+                                  : Colors.black,
+                            )),
+                        title: const Text('Delete'),
+                      ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),
