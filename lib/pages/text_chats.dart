@@ -38,43 +38,35 @@ class _TextChatsPageState extends State<TextChatsPage> {
                   return CreateTextChatRoomDialogBox();
                 },
               )),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          GetBuilder<ChatsController>(
-            assignId: true,
-            init: ChatsController(),
-            autoRemove: false,
-            builder: (controller) {
-              if (controller.chatRooms.isNotEmpty) {
-                return Expanded(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: controller.chatRooms.length,
-                    itemBuilder: (context, index) {
-                      return TextChatRoomTile(
-                        chatRoomData: controller.chatRooms[index],
-                      );
-                    },
-                  ),
+      body: GetBuilder<ChatsController>(
+        assignId: true,
+        init: ChatsController(),
+        autoRemove: false,
+        builder: (controller) {
+          if (controller.chatRooms.isNotEmpty) {
+            return ListView.builder(
+              shrinkWrap: true,
+              itemCount: controller.chatRooms.length,
+              itemBuilder: (context, index) {
+                return TextChatRoomTile(
+                  chatRoomData: controller.chatRooms[index],
                 );
-              } else if (controller.chatRooms.isEmpty &&
-                  controller.initialized) {
-                return const Center(
-                  child: Text(
-                    'No chats available\nCreate new chat by pressing add icon below',
-                    style: TextStyle(fontSize: 15),
-                    textAlign: TextAlign.center,
-                  ),
-                );
-              } else {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-            },
-          ),
-        ],
+              },
+            );
+          } else if (controller.chatRooms.isEmpty && controller.initialized) {
+            return const Center(
+              child: Text(
+                'No chats available\nCreate new chat by pressing add icon below',
+                style: TextStyle(fontSize: 15),
+                textAlign: TextAlign.center,
+              ),
+            );
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
       ),
     );
   }
