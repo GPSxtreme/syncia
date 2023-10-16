@@ -21,6 +21,7 @@ class ImageChatController extends GetxController {
   final DatabaseService databaseService = DatabaseService();
   final RxBool isSendingMessage = false.obs;
   final RxInt characterCount = 0.obs;
+  final RxInt genImgCount = 2.obs;
   final RxBool isInit = false.obs;
 
   ImageChatController({required this.roomId}) {
@@ -116,7 +117,8 @@ class ImageChatController extends GetxController {
     final prompt = inputController.text;
 
     try {
-      final response = await OpenAiService.generateImageOnPrompt(prompt);
+      final response = await OpenAiService.generateImageOnPrompt(prompt,
+          count: genImgCount.value);
       List<String> imageLinks = response.data
           .map((e) => e.url) // Mapping urls
           .whereType<
