@@ -20,10 +20,9 @@ class ChatsController extends GetxController {
   }
 
   Future<void> createTextChatRoom(String roomName, String modelName) async {
-    int roomId = await databaseService.createChatRoom(roomName, modelName);
+    final newRoom = await databaseService.createChatRoom(roomName, modelName);
     Get.back();
-    Get.toNamed(Routes.textChatPage,
-        arguments: {'roomId': roomId, 'isNew': true, 'modelId': modelName});
+    Get.toNamed(Routes.textChatPage, arguments: newRoom.toMap());
     await getChatRooms();
   }
 
