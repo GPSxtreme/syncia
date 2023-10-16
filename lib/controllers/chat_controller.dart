@@ -143,22 +143,22 @@ class ChatController extends GetxController {
           streamedResponse.write(response.choices.first.delta.content!);
 
           ChatMessage message = ChatMessage(
-              id: id!,
-              query: question.trim(),
-              response: streamedResponse.toString(),
-              timestamp: DateTime.now(),
-              read: false);
+            id: id!,
+            query: question.trim(),
+            response: streamedResponse.toString(),
+            timestamp: DateTime.now(),
+          );
 
           addOrUpdateMessage(message);
           scrollToBottom(addDelay: true, delay: 250);
         }, onDone: () {
           if (id != null) {
             ChatMessage finalMessage = ChatMessage(
-                id: id!,
-                query: question.trim(),
-                response: streamedResponse.toString(),
-                timestamp: DateTime.now(),
-                read: true);
+              id: id!,
+              query: question.trim(),
+              response: streamedResponse.toString(),
+              timestamp: DateTime.now(),
+            );
             databaseService.saveChatMessage(roomId, finalMessage);
             inputController.clear();
             scrollToBottom();
