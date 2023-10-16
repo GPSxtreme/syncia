@@ -5,6 +5,9 @@ import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:syncia/errors/exception_message.dart';
+import 'package:syncia/models/image_chat_room_data.dart';
+import 'package:syncia/models/image_chat_room_messages.dart';
+import 'package:syncia/models/image_room_message.dart';
 import 'package:syncia/models/saved_collection_room.dart';
 import '../models/chat_message.dart';
 import '../models/chat_room_data.dart';
@@ -15,6 +18,8 @@ class DatabaseService {
   static const String dbName = 'syncia.db';
   static const String chatRoomsDataStoreName = 'chat_rooms_data';
   static const String chatRoomsMessagesStoreName = 'chat_rooms_messages';
+  static const String imageRoomsDataStoreName = 'image_rooms_data';
+  static const String imageRoomsMessagesStoreName = 'image_rooms_messages';
   static const String savedCollectionRoomsDataStoreName =
       'saved_collection_rooms';
   static const String savedMessagesDataStoreName = 'saved_messages';
@@ -36,20 +41,24 @@ class DatabaseService {
 
   /* Operations on text chat rooms */
 
-  Future<int> createChatRoom(String name, String modelName) async {
-    final dataStore = intMapStoreFactory.store(chatRoomsDataStoreName);
-    final messageStore = intMapStoreFactory.store(chatRoomsMessagesStoreName);
-    int id = await dataStore.generateIntKey(await database);
-    final chatRoom = ChatRoomData(
-      id: id,
-      name: name,
-      modelName: modelName,
-      createdOn: DateTime.now().toIso8601String(),
-    );
-    await dataStore.add(await database, chatRoom.toMap());
-    await messageStore.add(
-        await database, ChatRoomMessages(id: id, messages: []).toJson());
-    return id;
+  Future<ChatRoomData> createChatRoom(String name, String modelName) async {
+    try {
+      final dataStore = intMapStoreFactory.store(chatRoomsDataStoreName);
+      final messageStore = intMapStoreFactory.store(chatRoomsMessagesStoreName);
+      int id = await dataStore.generateIntKey(await database);
+      final chatRoom = ChatRoomData(
+        id: id,
+        name: name,
+        modelName: modelName,
+        createdOn: DateTime.now().toIso8601String(),
+      );
+      await dataStore.add(await database, chatRoom.toMap());
+      await messageStore.add(
+          await database, ChatRoomMessages(id: id, messages: []).toJson());
+      return chatRoom;
+    } catch (e) {
+      throw ExceptionMessage(e.toString());
+    }
   }
 
   Future<void> _modifyMessages(
@@ -60,7 +69,7 @@ class DatabaseService {
         finder: Finder(filter: Filter.equals('id', roomId)));
 
     if (snapshot == null) {
-      throw Exception('Chat room not found');
+      throw ExceptionMessage('Chat room not found');
     }
 
     final chatRoom = ChatRoomMessages.fromJson(snapshot.value);
@@ -98,7 +107,7 @@ class DatabaseService {
 
       return messages;
     } else {
-      throw Exception('Chat room not found');
+      throw ExceptionMessage('Chat room not found');
     }
   }
 
@@ -113,7 +122,7 @@ class DatabaseService {
     final snapshot =
         await _store(chatRoomsDataStoreName).record(id).get(await database);
     if (snapshot == null) {
-      throw Exception('Chat room not found');
+      throw ExceptionMessage('Chat room not found');
     }
     return ChatRoomData.fromMap(snapshot);
   }
@@ -182,7 +191,7 @@ class DatabaseService {
         finder: Finder(filter: Filter.equals('id', collectionId)));
 
     if (snapshot == null) {
-      throw Exception('Collection not found');
+      throw ExceptionMessage('Collection not found');
     }
 
     final collection = SavedCollectionMessages.fromJson(snapshot.value);
@@ -233,7 +242,120 @@ class DatabaseService {
 
       return messages;
     } else {
-      throw Exception('Collection not found');
+      throw ExceptionMessage('Collection not found');
     }
+  }
+
+  /* operations on image rooms */
+
+  Future<ImageChatRoomData> createImageChatRoom(String name) async {
+    try {
+      final dataStore = intMapStoreFactory.store(imageRoomsDataStoreName);
+      final messageStore =
+          intMapStoreFactory.store(imageRoomsMessagesStoreName);
+      int id = await dataStore.generateIntKey(await database);
+      final imageChatRoom = ImageChatRoomData(
+        id: id,
+        name: name,
+        createdOn: DateTime.now().toIso8601String(),
+      );
+      await dataStore.add(await database, imageChatRoom.toJson());
+      await messageStore.add(
+          await database, ImageChatRoomMessages(id: id, messages: []).toJson());
+      return imageChatRoom;
+    } catch (e) {
+      throw ExceptionMessage(e.toString());
+    }
+  }
+
+  Future<void> _modifyImageMessages(
+      int roomId, Function(List<Map<String, dynamic>>) modify) async {
+    final db = await database;
+    final messageStore = _store(imageRoomsMessagesStoreName);
+    final snapshot = await messageStore.findFirst(db,
+        finder: Finder(filter: Filter.equals('id', roomId)));
+
+    if (snapshot == null) {
+      throw ExceptionMessage('image chat room not found');
+    }
+
+    final imageChatRoom = ImageChatRoomMessages.fromJson(snapshot.value);
+    modify(imageChatRoom.messages);
+    await messageStore.record(snapshot.key).put(db, imageChatRoom.toJson());
+  }
+
+  Future<void> saveImageChatMessage(
+      int roomId, ImageRoomMessage message) async {
+    await _modifyImageMessages(
+        roomId, (messages) => messages.add(message.toMap()));
+  }
+
+  Future<List<ImageRoomMessage>> getImageChatMessages(int roomId,
+      {int end = 0, int limit = 20}) async {
+    final db = await database;
+    final messageStore = _store(imageRoomsMessagesStoreName);
+
+    final finder = Finder(
+      filter: Filter.equals('id', roomId),
+    );
+
+    final snapshot = await messageStore.findFirst(db, finder: finder);
+
+    if (snapshot != null) {
+      final chatRoom = ImageChatRoomMessages.fromJson(snapshot.value);
+      final allMessages =
+          chatRoom.messages.map((e) => ImageRoomMessage.fromMap(e)).toList();
+
+      // Ensure startIndex is not negative
+      int startIndex = max(0, allMessages.length - end - limit);
+      // Ensure endIndex does not exceed the length of the list and is not negative
+      int endIndex = max(0, min(allMessages.length - end, allMessages.length));
+
+      // Slice the list for pagination.
+      final messages = allMessages.sublist(startIndex, endIndex);
+
+      return messages;
+    } else {
+      throw ExceptionMessage('Image chat room not found');
+    }
+  }
+
+  Future<List<ImageChatRoomData>> getImageChatRooms() async {
+    final snapshots =
+        await _store(imageRoomsDataStoreName).find(await database);
+    return snapshots
+        .map((snapshot) => ImageChatRoomData.fromJson(snapshot.value))
+        .toList();
+  }
+
+  Future<ImageChatRoomData> getImageChatRoomById(int id) async {
+    final snapshot =
+        await _store(imageRoomsDataStoreName).record(id).get(await database);
+    if (snapshot == null) {
+      throw ExceptionMessage('Image chat room not found');
+    }
+    return ImageChatRoomData.fromJson(snapshot);
+  }
+
+  Future<void> updateImageChatRoom(ImageChatRoomData room) async {
+    await _store(imageRoomsDataStoreName)
+        .record(room.id)
+        .update(await database, room.toJson());
+  }
+
+  Future<void> deleteImageChatRoom(int id) async {
+    final db = await database;
+    final dataStore = _store(imageRoomsDataStoreName);
+    final messageStore = _store(imageRoomsMessagesStoreName);
+
+    await Future.wait([
+      messageStore.delete(db, finder: Finder(filter: Filter.equals('id', id))),
+      dataStore.delete(db, finder: Finder(filter: Filter.equals('id', id)))
+    ]);
+  }
+
+  Future<void> deleteImageChatMessage(int roomId, String messageId) async {
+    _modifyImageMessages(roomId,
+        (messages) => messages.removeWhere((m) => m['id'] == messageId));
   }
 }
