@@ -124,7 +124,7 @@ class OpenAiService {
   /// Generates based on the given [prompt]
   /// [count] defines the number of images to be generated
   static Future<OpenAIImageModel> generateImageOnPrompt(String prompt,
-      {int count = 1}) async {
+      {int count = 3}) async {
     return await OpenAI.instance.image.create(
       prompt: prompt,
       n: count,
