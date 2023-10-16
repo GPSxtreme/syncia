@@ -3,14 +3,11 @@ class ChatMessage {
   final String query;
   final String response;
   final DateTime timestamp;
-  bool read;
-
   ChatMessage({
     required this.id,
     required this.query,
     required this.response,
     required this.timestamp,
-    this.read = false,
   });
 
   factory ChatMessage.fromMap(Map<String, dynamic> map) {
