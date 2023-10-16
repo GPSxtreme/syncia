@@ -1,10 +1,11 @@
 import 'package:get/get_navigation/src/routes/get_route.dart';
-import 'package:syncia/pages/settings.dart';
-import 'package:syncia/pages/splash.dart';
-import 'package:syncia/pages/text_chat.dart';
-import 'package:syncia/pages/text_chats.dart';
-import 'package:syncia/pages/saved_collections.dart';
-
+import 'pages/image_chat.dart';
+import 'pages/settings.dart';
+import 'pages/splash.dart';
+import 'pages/text_chat.dart';
+import 'pages/text_chats.dart';
+import 'pages/saved_collections.dart';
+import 'pages/image_chats.dart';
 import 'pages/saved_collection.dart';
 
 class Routes {
@@ -14,6 +15,8 @@ class Routes {
   static String settingsPage = '/settings';
   static String savedCollectionsPage = '/saved_collections';
   static String savedCollectionPage = '/saved_collection';
+  static String imageChatsPage = '/image_chats';
+  static String imageChatPage = '/image_chat';
 }
 
 final getPages = [
@@ -40,5 +43,13 @@ final getPages = [
   GetPage(
     name: Routes.savedCollectionPage,
     page: () => const SavedCollectionPage(),
+  ),
+  GetPage(
+    name: Routes.imageChatsPage,
+    page: () => const ImageChatsPage(),
+  ),
+  GetPage(
+    name: Routes.imageChatPage,
+    page: () => const ImageChatPage(),
   )
 ];
