@@ -16,6 +16,7 @@ class SavedCollectionsPage extends StatelessWidget {
       appBar: AppBar(
         centerTitle: true,
         title: const Text('Saved'),
+        elevation: 0.5,
       ),
       floatingActionButton: FloatingActionButton(
           child: Obx(() => Icon(
@@ -32,42 +33,34 @@ class SavedCollectionsPage extends StatelessWidget {
                   return const CreateCollectionDialogBox();
                 },
               )),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          GetBuilder<SavedCollectionsController>(
-            assignId: true,
-            init: SavedCollectionsController(),
-            autoRemove: false,
-            builder: (controller) {
-              if (controller.collections.isNotEmpty) {
-                return Expanded(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: controller.collections.length,
-                    itemBuilder: (context, index) {
-                      final collection = controller.collections[index];
-                      return SavedCollectionTile(collection: collection);
-                    },
-                  ),
-                );
-              } else if (controller.collections.isEmpty &&
-                  controller.initialized) {
-                return const Center(
-                  child: Text(
-                    'No saved collections available\nCreate new collection by pressing add icon below',
-                    style: TextStyle(fontSize: 15),
-                    textAlign: TextAlign.center,
-                  ),
-                );
-              } else {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-            },
-          ),
-        ],
+      body: GetBuilder<SavedCollectionsController>(
+        assignId: true,
+        init: SavedCollectionsController(),
+        autoRemove: false,
+        builder: (controller) {
+          if (controller.collections.isNotEmpty) {
+            return ListView.builder(
+              shrinkWrap: true,
+              itemCount: controller.collections.length,
+              itemBuilder: (context, index) {
+                final collection = controller.collections[index];
+                return SavedCollectionTile(collection: collection);
+              },
+            );
+          } else if (controller.collections.isEmpty && controller.initialized) {
+            return const Center(
+              child: Text(
+                'No saved collections available\nCreate new collection by pressing add icon below',
+                style: TextStyle(fontSize: 15),
+                textAlign: TextAlign.center,
+              ),
+            );
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
       ),
     );
   }
