@@ -7,14 +7,19 @@ import 'package:syncia/widgets/image_chat_text_field.dart';
 import '../styles/size_config.dart';
 import '../widgets/image_chat_tile.dart';
 
-class ImageChatPage extends StatelessWidget {
+class ImageChatPage extends StatefulWidget {
   const ImageChatPage({super.key});
 
   @override
+  State<ImageChatPage> createState() => _ImageChatPageState();
+}
+
+class _ImageChatPageState extends State<ImageChatPage> {
+  final ImageChatRoomData chatRoomData =
+      ImageChatRoomData.fromJson(Get.arguments);
+  @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    final ImageChatRoomData chatRoomData =
-        ImageChatRoomData.fromJson(Get.arguments);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
