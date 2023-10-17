@@ -1,6 +1,11 @@
 // ignore_for_file: constant_identifier_names, non_constant_identifier_names
+import 'dart:typed_data';
+import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:syncia/models/image_room_message.dart';
 import 'package:uuid/uuid.dart';
 import '../services/local_database_service.dart';
@@ -124,7 +129,6 @@ class ImageChatController extends GetxController {
           .whereType<
               String>() // Filtering out null values and ensuring every element is a String
           .toList(); // Converting the Iterable to a List
-
       final chatMessage = ImageRoomMessage(
           id: const Uuid().v4(),
           query: prompt,
@@ -208,6 +212,35 @@ class ImageChatController extends GetxController {
       });
     } catch (e) {
       Get.snackbar("Error", "Failed deleting message");
+    }
+  }
+
+  Future<void> saveImage(String imageUrl, String cacheKey) async {
+    final status = await Permission.photos.request();
+    if (status.isGranted) {
+      final DefaultCacheManager cacheManager = DefaultCacheManager();
+      final FileInfo? cacheFile = await cacheManager.getFileFromCache(cacheKey);
+
+      Uint8List? imageBytes;
+      if (cacheFile != null) {
+        // If the file is found in the cache, use it
+        imageBytes = await cacheFile.file.readAsBytes();
+      } else {
+        // If the file is not found in the cache, download it
+        final response = await http.get(Uri.parse(imageUrl));
+        imageBytes = response.bodyBytes;
+      }
+
+      // Save the image to the gallery
+      final result = await ImageGallerySaver.saveImage(imageBytes);
+      if (result['isSuccess']) {
+        Get.snackbar("Success", "Image saved");
+      } else {
+        Get.snackbar("Error", "Failed to save image");
+      }
+    } else {
+      Get.snackbar("Error",
+          "Permission denied to save image.\nAllow storage permissions to save image");
     }
   }
 }
