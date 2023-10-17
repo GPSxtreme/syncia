@@ -74,6 +74,7 @@ class ImageChatTextField extends StatelessWidget {
                   children: [
                     // "-" Button
                     IconButton(
+                      tooltip: 'Decrease images generated',
                       onPressed: () {
                         if (controller.genImgCount > 1) {
                           controller.genImgCount.value--;
@@ -93,6 +94,7 @@ class ImageChatTextField extends StatelessWidget {
 
                     // "+" Button
                     IconButton(
+                      tooltip: 'Increase images generated',
                       onPressed: () {
                         if (controller.genImgCount < 4) {
                           controller.genImgCount.value++;
