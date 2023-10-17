@@ -5,6 +5,7 @@ import 'package:syncia/models/image_room_message.dart';
 import 'package:get/get.dart';
 
 import '../controllers/theme_controller.dart';
+import '../route.dart';
 import '../styles/size_config.dart';
 
 class ImageChatTile extends StatelessWidget {
@@ -73,35 +74,41 @@ class ImageChatTile extends StatelessWidget {
                 shrinkWrap: true,
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (context, index) {
-                  return CachedNetworkImage(
-                    imageUrl: message.imageLinks[index],
-                    cacheKey: message.imageLinks[index].split('/').last,
-                    fit: BoxFit.cover,
-                    progressIndicatorBuilder: (context, url, progress) {
-                      return SizedBox(
-                        width: SizeConfig.screenWidth,
-                        child: Center(
-                            heightFactor: 5,
-                            child: CircularProgressIndicator(
-                                value: progress.progress)),
-                      );
+                  return GestureDetector(
+                    onTap: () {
+                      Get.toNamed(Routes.imageFullScreenPage,
+                          arguments: message.toMap());
                     },
-                    errorWidget: (context, url, error) => Padding(
-                      padding: EdgeInsets.only(
-                          left: SizeConfig.blockSizeHorizontal! * 35,
-                          top: SizeConfig.blockSizeVertical! * 15),
-                      child: const Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.error,
-                            color: Colors.red,
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Text("Failed fetching image")
-                        ],
+                    child: CachedNetworkImage(
+                      imageUrl: message.imageLinks[index],
+                      cacheKey: message.imageLinks[index].split('/').last,
+                      fit: BoxFit.cover,
+                      progressIndicatorBuilder: (context, url, progress) {
+                        return SizedBox(
+                          width: SizeConfig.screenWidth,
+                          child: Center(
+                              heightFactor: 5,
+                              child: CircularProgressIndicator(
+                                  value: progress.progress)),
+                        );
+                      },
+                      errorWidget: (context, url, error) => Padding(
+                        padding: EdgeInsets.only(
+                            left: SizeConfig.blockSizeHorizontal! * 35,
+                            top: SizeConfig.blockSizeVertical! * 15),
+                        child: const Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.error,
+                              color: Colors.red,
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Text("Failed loading image")
+                          ],
+                        ),
                       ),
                     ),
                   );
