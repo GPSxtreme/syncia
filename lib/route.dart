@@ -1,4 +1,5 @@
 import 'package:get/get_navigation/src/routes/get_route.dart';
+import 'errors/view_error.dart';
 import 'pages/image_chat.dart';
 import 'pages/image_full_screen.dart';
 import 'pages/settings.dart';
@@ -19,6 +20,7 @@ class Routes {
   static String imageChatsPage = '/image_chats';
   static String imageChatPage = '/image_chat';
   static String imageFullScreenPage = '/image_full_screen';
+  static String viewErrorPage = '/view_error';
 }
 
 final getPages = [
@@ -57,5 +59,9 @@ final getPages = [
   GetPage(
     name: Routes.imageFullScreenPage,
     page: () => const ImageFullScreenPage(),
+  ),
+  GetPage(
+    name: Routes.viewErrorPage,
+    page: () => const ViewErrorPage(),
   )
 ];
