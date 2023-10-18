@@ -1,5 +1,7 @@
 // ignore_for_file: constant_identifier_names, non_constant_identifier_names
+
 import 'dart:typed_data';
+import 'package:dart_openai/dart_openai.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -8,8 +10,10 @@ import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:syncia/models/image_room_message.dart';
 import 'package:uuid/uuid.dart';
+import '../route.dart';
 import '../services/local_database_service.dart';
 import '../services/open_ai_service.dart';
+import 'package:flutter/material.dart';
 
 const int MAX_CHAR = 10000;
 const int INITIAL_MESSAGE_LOAD_COUNT = 10;
@@ -141,7 +145,19 @@ class ImageChatController extends GetxController {
         scrollToBottom();
       });
     } catch (error) {
-      Get.snackbar('Error', 'Failed to process request.');
+      Get.snackbar(
+          'Error', 'Failed to process request.\nClick here to view full log',
+          icon: const Icon(Icons.error), onTap: (_) {
+        if (error is MissingApiKeyException) {
+          Get.toNamed(Routes.viewErrorPage, arguments: {
+            'log':
+                'API key is not set\nplease go to settings and input open ai key.'
+          });
+        } else {
+          Get.toNamed(Routes.viewErrorPage,
+              arguments: {'log': error.toString()});
+        }
+      });
       isSendingMessage.value = false;
     }
   }
