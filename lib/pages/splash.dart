@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:syncia/styles/app_styles.dart';
+import '../controllers/settings_controller.dart';
 import '../route.dart';
 import '../styles/size_config.dart';
 
@@ -17,8 +18,11 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     super.initState();
     // redirect to home page
-    Future.delayed(const Duration(seconds: 2), () {
-      Get.offAndToNamed(Routes.textChatsPage);
+    Future.delayed(const Duration(seconds: 2), () async {
+      Get.put(SettingsController(), permanent: true);
+      if (SettingsController.to.apiKeyController.text.isNotEmpty) {
+        Get.offAndToNamed(Routes.textChatsPage);
+      }
     });
   }
 
