@@ -14,7 +14,7 @@ class OpenAiService {
     return await OpenAI.instance.model.retrieve(id);
   }
 
-  /// Returns the completion model with the given id
+  /// Returns the completion model with the given ids
   static Future<OpenAICompletionModel> getCompletion(
       String prompt, String model) async {
     return await OpenAI.instance.completion.create(
