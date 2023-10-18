@@ -3,8 +3,10 @@ import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import '../models/chat_message.dart';
+import '../route.dart';
 import '../services/local_database_service.dart';
 import '../services/open_ai_service.dart';
+import 'package:flutter/material.dart';
 
 const int MAX_CHAR = 10000;
 const int INITIAL_MESSAGE_LOAD_COUNT = 10;
@@ -165,14 +167,34 @@ class ChatController extends GetxController {
           }
           isSendingMessage.value = false;
         }, onError: (error) {
-          Get.snackbar('Error', 'Failed to process request.');
+          Get.snackbar('Error', 'Failed to process request.',
+              icon: const Icon(Icons.error), onTap: (_) {
+            Get.toNamed(Routes.viewErrorPage,
+                arguments: {'log': error.toString()});
+          });
           isSendingMessage.value = false;
         });
       } else {
-        Get.snackbar('Error', 'Failed to process request.');
+        Get.snackbar(
+          'Error',
+          'Failed to process request.',
+          icon: const Icon(Icons.error),
+        );
       }
     } catch (error) {
-      Get.snackbar('Error', 'Failed to process request.');
+      Get.snackbar(
+          'Error', 'Failed to process request.\nClick here to view full log',
+          icon: const Icon(Icons.error), onTap: (_) {
+        if (error is MissingApiKeyException) {
+          Get.toNamed(Routes.viewErrorPage, arguments: {
+            'log':
+                'API key is not set\nplease go to settings and input open ai key.'
+          });
+        } else {
+          Get.toNamed(Routes.viewErrorPage,
+              arguments: {'log': error.toString()});
+        }
+      });
       isSendingMessage.value = false;
     }
   }
