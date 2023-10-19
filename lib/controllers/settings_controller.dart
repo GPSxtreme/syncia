@@ -2,14 +2,14 @@ import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:syncia/controllers/obscured_text_editing_controller.dart';
 import 'package:syncia/services/open_ai_service.dart';
-
 import '../route.dart';
 
 class SettingsController extends GetxController {
   static SettingsController get to => Get.find();
   final _storage = const FlutterSecureStorage();
-  final apiKeyController = TextEditingController();
+  final apiKeyController = ObscuredTextEditingController();
   @override
   void onInit() async {
     super.onInit();
