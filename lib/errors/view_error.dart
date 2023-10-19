@@ -8,6 +8,7 @@ class ViewErrorPage extends StatelessWidget {
     final String log = Get.arguments['log'];
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: const Text('Error log'),
       ),
       body: Padding(
