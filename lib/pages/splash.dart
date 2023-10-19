@@ -18,8 +18,8 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     super.initState();
     // redirect to home page
+    Get.put(SettingsController(), permanent: true);
     Future.delayed(const Duration(seconds: 2), () async {
-      Get.put(SettingsController(), permanent: true);
       if (SettingsController.to.apiKeyController.text.isNotEmpty) {
         Get.offAndToNamed(Routes.textChatsPage);
       }
