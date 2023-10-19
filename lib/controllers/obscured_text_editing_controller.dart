@@ -16,9 +16,9 @@ class ObscuredTextEditingController extends TextEditingController {
 
   @override
   TextEditingValue get value => TextEditingValue(
-    text: _obscureText(_trueText),
-    selection: TextSelection.collapsed(offset: _trueText.length),
-  );
+        text: _obscureText(_trueText),
+        selection: TextSelection.collapsed(offset: _trueText.length),
+      );
 
   void updateTrueText(String newText) {
     _trueText = newText;
