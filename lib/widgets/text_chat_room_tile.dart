@@ -14,15 +14,18 @@ class TextChatRoomTile extends StatelessWidget {
     return ListTile(
       title: Text(
         chatRoomData.name,
-        style: const TextStyle(fontSize: 15),
+        style: const TextStyle(fontSize: 18),
       ),
       onTap: () {
         // go to text chat page
         Get.toNamed(Routes.textChatPage, arguments: chatRoomData.toMap());
       },
-      subtitle: Text(
-        'Created on : ${DateFormat('d MMMM, h:mm a').format(DateTime.parse(chatRoomData.createdOn).toLocal())}',
-        style: const TextStyle(fontSize: 12),
+      subtitle: Padding(
+        padding: const EdgeInsets.only(top: 3),
+        child: Text(
+          'Created on : ${DateFormat('d MMMM, h:mm a').format(DateTime.parse(chatRoomData.createdOn).toLocal())}',
+          style: const TextStyle(fontSize: 15),
+        ),
       ),
       trailing: IconButton(
         onPressed: () async {

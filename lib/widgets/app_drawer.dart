@@ -13,6 +13,7 @@ class AppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     return Drawer(
+      elevation: 0,
       child: SafeArea(
         child: ListView(
           padding: EdgeInsets.zero,

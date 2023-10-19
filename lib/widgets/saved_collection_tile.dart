@@ -14,15 +14,18 @@ class SavedCollectionTile extends StatelessWidget {
     return ListTile(
       title: Text(
         collection.name,
-        style: const TextStyle(fontSize: 15),
+        style: const TextStyle(fontSize: 18),
       ),
       onTap: () {
         // go to text chat page
         Get.toNamed(Routes.savedCollectionPage, arguments: collection.toMap());
       },
-      subtitle: Text(
-        'Created on : ${DateFormat('d MMMM, h:mm a').format(DateTime.parse(collection.createdOn).toLocal())}',
-        style: const TextStyle(fontSize: 12),
+      subtitle: Padding(
+        padding: const EdgeInsets.only(top: 3),
+        child: Text(
+          'Created on : ${DateFormat('d MMMM, h:mm a').format(DateTime.parse(collection.createdOn).toLocal())}',
+          style: const TextStyle(fontSize: 15),
+        ),
       ),
       trailing: IconButton(
         onPressed: () async {
