@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncia/controllers/settings_controller.dart';
+import 'package:syncia/controllers/theme_controller.dart';
 import 'package:syncia/widgets/app_drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -64,17 +65,19 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8.0),
-                        child: TextField(
-                            controller: controller.apiKeyController,
-                            onSubmitted: (_) async {
-                              await controller.saveApiKey();
-                            },
-                            decoration: const InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white24,
-                              hintText: "Please input api key",
-                              border: InputBorder.none,
-                            )),
+                        child: Obx(
+                            ()=>TextField(
+                              controller: controller.apiKeyController,
+                              onSubmitted: (_) async {
+                                await controller.saveApiKey();
+                              },
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: ThemeController.to.isDarkTheme.value ? Colors.white24 : Colors.black12,
+                                hintText: "Please input api key",
+                                border: InputBorder.none,
+                              )),
+                        ),
                       ),
                     ],
                   ),
