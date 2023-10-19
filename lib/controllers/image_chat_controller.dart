@@ -126,6 +126,7 @@ class ImageChatController extends GetxController {
     final prompt = inputController.text;
 
     try {
+      inputController.clear();
       final response = await OpenAiService.generateImageOnPrompt(prompt,
           count: genImgCount.value);
       List<String> imageLinks = response.data
@@ -141,7 +142,6 @@ class ImageChatController extends GetxController {
       await databaseService.saveImageChatMessage(roomId, chatMessage).then((_) {
         addMessage(chatMessage);
         isSendingMessage.value = false;
-        inputController.clear();
         scrollToBottom();
       });
     } catch (error) {
