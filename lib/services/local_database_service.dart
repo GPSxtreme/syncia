@@ -4,6 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncia/errors/exception_message.dart';
 import 'package:syncia/models/image_chat_room_data.dart';
 import 'package:syncia/models/image_chat_room_messages.dart';
@@ -13,6 +14,8 @@ import '../models/chat_message.dart';
 import '../models/chat_room_data.dart';
 import '../models/chat_room_messages.dart';
 import '../models/saved_collection_messages.dart';
+
+enum ThemeSetting { light, dark, systemDefault }
 
 class DatabaseService {
   static const String dbName = 'syncia.db';
@@ -357,5 +360,28 @@ class DatabaseService {
   Future<void> deleteImageChatMessage(int roomId, String messageId) async {
     _modifyImageMessages(roomId,
         (messages) => messages.removeWhere((m) => m['id'] == messageId));
+  }
+
+  /* settings data */
+  Future<void> setThemeSetting(ThemeSetting preset) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString('themePreset', preset.name);
+    } catch (e) {
+      throw ExceptionMessage(e.toString());
+    }
+  }
+
+  Future<ThemeSetting> getThemeSetting() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? snapshot = prefs.getString('themePreset');
+      if (snapshot == null) {
+        return ThemeSetting.systemDefault;
+      }
+      return ThemeSetting.values.firstWhere((e) => e.name == snapshot);
+    } catch (e) {
+      throw ExceptionMessage(e.toString());
+    }
   }
 }
