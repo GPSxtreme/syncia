@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncia/controllers/settings_controller.dart';
 import 'package:syncia/controllers/theme_controller.dart';
+import 'package:syncia/services/local_database_service.dart';
 import 'package:syncia/widgets/app_drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -91,6 +91,48 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                     ],
                   ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                ListTile(
+                  title: const Text(
+                    "Theme",
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Text('pick your desired theme setting'),
+                        Obx(() => DropdownButton(
+                              isExpanded: true,
+                              value: ThemeController.to.themeSetting.value,
+                              items: const [
+                                DropdownMenuItem(
+                                  value: ThemeSetting.light,
+                                  child: Text('Light theme'),
+                                ),
+                                DropdownMenuItem(
+                                  value: ThemeSetting.dark,
+                                  child: Text('Dark theme'),
+                                ),
+                                DropdownMenuItem(
+                                  value: ThemeSetting.systemDefault,
+                                  child: Text('System default'),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                if (value == ThemeSetting.systemDefault) {
+                                  ThemeController.to.setToSystemDefault();
+                                } else {
+                                  ThemeController.to.toggleTheme(preset: value);
+                                }
+                              },
+                            ))
+                      ]),
                 )
               ],
             );
