@@ -4,7 +4,8 @@ import 'controllers/theme_controller.dart';
 import 'route.dart';
 
 class MyApp extends StatelessWidget {
-  final ThemeController _themeController = Get.put(ThemeController());
+  final ThemeController _themeController =
+      Get.put(ThemeController(), permanent: true);
   MyApp({super.key});
 
   @override
