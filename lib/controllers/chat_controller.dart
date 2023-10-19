@@ -140,6 +140,7 @@ class ChatController extends GetxController {
 
       if (stream != null) {
         String? id;
+        inputController.clear();
         stream.listen((response) {
           id = response.id;
           streamedResponse.write(response.choices.first.delta.content!);
@@ -162,7 +163,6 @@ class ChatController extends GetxController {
               timestamp: DateTime.now(),
             );
             databaseService.saveChatMessage(roomId, finalMessage);
-            inputController.clear();
             scrollToBottom();
           }
           isSendingMessage.value = false;
