@@ -6,6 +6,7 @@ import 'package:syncia/controllers/theme_controller.dart';
 import 'package:syncia/widgets/app_drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
@@ -37,27 +38,34 @@ class _SettingsPageState extends State<SettingsPage> {
                       const SizedBox(
                         height: 10,
                       ),
-                      RichText(
-                        text: TextSpan(
-                          children: <TextSpan>[
-                            const TextSpan(
-                                text:
-                                    'You can get the api key from this link\n'),
-                            TextSpan(
-                                text:
-                                    'https://platform.openai.com/account/api-keys',
-                                style: const TextStyle(color: Colors.blue),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () async {
-                                    final url = Uri.parse(
-                                        'https://platform.openai.com/account/api-keys');
-                                    if (await canLaunchUrl(url)) {
-                                      await launchUrl(url);
-                                    } else {
-                                      throw 'Could not launch $url';
-                                    }
-                                  }),
-                          ],
+                      Obx(
+                        () => RichText(
+                          text: TextSpan(
+                            children: <TextSpan>[
+                              TextSpan(
+                                  style: TextStyle(
+                                      color:
+                                          ThemeController.to.isDarkTheme.value
+                                              ? Colors.white
+                                              : Colors.black),
+                                  text:
+                                      'You can get the api key from this link\n'),
+                              TextSpan(
+                                  text:
+                                      'https://platform.openai.com/account/api-keys',
+                                  style: const TextStyle(color: Colors.blue),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () async {
+                                      final url = Uri.parse(
+                                          'https://platform.openai.com/account/api-keys');
+                                      if (await canLaunchUrl(url)) {
+                                        await launchUrl(url);
+                                      } else {
+                                        throw 'Could not launch $url';
+                                      }
+                                    }),
+                            ],
+                          ),
                         ),
                       ),
                       const SizedBox(
@@ -66,14 +74,16 @@ class _SettingsPageState extends State<SettingsPage> {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8.0),
                         child: Obx(
-                            ()=>TextField(
+                          () => TextField(
                               controller: controller.apiKeyController,
                               onSubmitted: (_) async {
                                 await controller.saveApiKey();
                               },
                               decoration: InputDecoration(
                                 filled: true,
-                                fillColor: ThemeController.to.isDarkTheme.value ? Colors.white24 : Colors.black12,
+                                fillColor: ThemeController.to.isDarkTheme.value
+                                    ? Colors.white24
+                                    : Colors.black12,
                                 hintText: "Please input api key",
                                 border: InputBorder.none,
                               )),
