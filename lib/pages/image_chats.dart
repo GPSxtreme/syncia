@@ -34,7 +34,6 @@ class ImageChatsPage extends StatelessWidget {
                 },
               )),
       body: GetBuilder<ImageChatsController>(
-        init: ImageChatsController(),
         builder: (controller) {
           if (controller.chatRooms.isNotEmpty) {
             return ListView.builder(
