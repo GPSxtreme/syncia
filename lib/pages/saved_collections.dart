@@ -35,7 +35,6 @@ class SavedCollectionsPage extends StatelessWidget {
               )),
       body: GetBuilder<SavedCollectionsController>(
         assignId: true,
-        init: SavedCollectionsController(),
         autoRemove: false,
         builder: (controller) {
           if (controller.collections.isNotEmpty) {
