@@ -59,6 +59,7 @@ dependencies:
   url_launcher: ^6.1.14
   package_info_plus: ^4.2.0
   ionicons: ^0.2.2
+  in_app_update: ^4.2.2
 
 dev_dependencies:
   flutter_test:
