@@ -40,7 +40,6 @@ class _TextChatsPageState extends State<TextChatsPage> {
               )),
       body: GetBuilder<ChatsController>(
         assignId: true,
-        init: ChatsController(),
         autoRemove: false,
         builder: (controller) {
           if (controller.chatRooms.isNotEmpty) {
