@@ -227,7 +227,9 @@ class _SettingsPageState extends State<SettingsPage> {
                           style: TextStyle(fontSize: 18),
                         ),
                         leading: const Icon(Icons.update),
-                        onTap: () {},
+                        onTap: () async {
+                          await SettingsController.inAppUpdate();
+                        },
                       ),
                     ],
                   ),
