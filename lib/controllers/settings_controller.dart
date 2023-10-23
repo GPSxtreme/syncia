@@ -2,6 +2,7 @@ import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:in_app_update/in_app_update.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:syncia/services/open_ai_service.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -34,7 +35,7 @@ class SettingsController extends GetxController {
   }
 
   Future<void> loadApiKey() async {
-    String? apiKey = await _storage.read(key: 'API_KEY');
+    String? apiKey = await _storage.read(key: 'OPEN_AI_API_KEY');
     if (apiKey != null) {
       try {
         OpenAI.apiKey = apiKey;
@@ -59,7 +60,7 @@ class SettingsController extends GetxController {
   Future<void> saveApiKey() async {
     try {
       String apiKey = apiKeyController.text;
-      await _storage.write(key: 'API_KEY', value: apiKey);
+      await _storage.write(key: 'OPEN_AI_API_KEY', value: apiKey);
       OpenAI.apiKey = apiKey;
       await OpenAiService.init();
       Get.snackbar('Success', 'Api key updated successfully!',
@@ -79,6 +80,21 @@ class SettingsController extends GetxController {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } catch (e) {
       Get.snackbar('Error', 'Error launching link\nClick here to view full log',
+          icon: const Icon(Icons.error), onTap: (_) {
+        Get.toNamed(Routes.viewErrorPage, arguments: {'log': e.toString()});
+      });
+    }
+  }
+
+  static Future<void> inAppUpdate() async {
+    try {
+      final updateInfo = await InAppUpdate.checkForUpdate();
+      if (updateInfo.updateAvailability == UpdateAvailability.updateAvailable) {
+        InAppUpdate.completeFlexibleUpdate();
+      }
+    } catch (e) {
+      Get.snackbar(
+          'Error', 'Error checking for update \nClick here to view full log',
           icon: const Icon(Icons.error), onTap: (_) {
         Get.toNamed(Routes.viewErrorPage, arguments: {'log': e.toString()});
       });
