@@ -5,10 +5,42 @@ import 'package:syncia/models/saved_collection_room.dart';
 import 'package:get/get.dart';
 
 import '../route.dart';
+import 'common_widgets.dart';
 
 class SavedCollectionTile extends StatelessWidget {
   const SavedCollectionTile({super.key, required this.collection});
   final SavedCollectionRoom collection;
+  _showModalBottomSheet(BuildContext context) => showModalBottomSheet(
+      showDragHandle: true,
+      context: context,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 30),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                onTap: () async {
+                  bool? response = await CommonWidgets.commonAlertDialog(
+                      context,
+                      title: 'Delete collection?',
+                      body: 'This action is irreversible',
+                      agreeLabel: "Yes",
+                      denyLabel: "No");
+                  if (response == true) {
+                    await SavedCollectionsController.to
+                        .deleteChatRoom(collection.id);
+                  }
+                  Get.back();
+                },
+                leading: const Icon(Icons.delete),
+                title: const Text('Delete collection'),
+              )
+            ],
+          ),
+        );
+      });
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -27,15 +59,9 @@ class SavedCollectionTile extends StatelessWidget {
           style: const TextStyle(fontSize: 15),
         ),
       ),
-      trailing: IconButton(
-        onPressed: () async {
-          await SavedCollectionsController.to.deleteChatRoom(collection.id);
-        },
-        icon: const Icon(
-          Icons.delete,
-          size: 30,
-        ),
-      ),
+      onLongPress: () {
+        _showModalBottomSheet(context);
+      },
     );
   }
 }
