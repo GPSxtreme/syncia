@@ -54,11 +54,7 @@ class CreateImageChatRoomDialogBox extends StatelessWidget {
                   if (nameController.text.isNotEmpty) {
                     await ImageChatsController.to
                         .createImageChatRoom(nameController.text)
-                        .then((_) {
-                      Get.back();
-                      Get.snackbar('Success',
-                          'Chat room ${nameController.text} created');
-                    }).onError((error, stackTrace) {
+                        .onError((error, stackTrace) {
                       Get.snackbar("Error", "Failed to create chat room");
                     });
                   }
