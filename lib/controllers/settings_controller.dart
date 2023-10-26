@@ -54,12 +54,22 @@ class SettingsController extends GetxController {
 
   Future<void> saveApiKey() async {
     try {
-      String apiKey = apiKeyController.text;
-      await _storage.write(key: 'OPEN_AI_API_KEY', value: apiKey);
-      OpenAI.apiKey = apiKey;
-      await OpenAiService.init();
-      Get.snackbar('Success', 'Api key updated successfully!',
-          icon: const Icon(Icons.check));
+      if (apiKeyController.text.isNotEmpty ||
+          apiKeyController.text.length < 10) {
+        String apiKey = apiKeyController.text;
+        await _storage.write(key: 'OPEN_AI_API_KEY', value: apiKey);
+        OpenAI.apiKey = apiKey;
+        await OpenAiService.init();
+        Get.snackbar('Success', 'Api key updated successfully!',
+            icon: const Icon(Icons.check));
+      } else {
+        Get.snackbar("Error", "Api key not valid",
+            icon: const Icon(Icons.error));
+        String? apiKey = await _storage.read(key: 'OPEN_AI_API_KEY');
+        if(apiKey != null){
+          apiKeyController.text = apiKey;
+        }
+      }
     } catch (e) {
       Get.snackbar(
           'Error', 'Failed to set api key.\nClick here to view full log',
@@ -86,7 +96,7 @@ class SettingsController extends GetxController {
       final updateInfo = await InAppUpdate.checkForUpdate();
       if (updateInfo.updateAvailability == UpdateAvailability.updateAvailable) {
         InAppUpdate.completeFlexibleUpdate();
-      } else if (showElse){
+      } else if (showElse) {
         Get.snackbar("App on latest version!", "No updates available");
       }
     } catch (e) {
