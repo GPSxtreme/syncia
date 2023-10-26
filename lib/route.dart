@@ -1,4 +1,5 @@
 import 'package:get/get_navigation/src/routes/get_route.dart';
+import 'package:syncia/pages/introduction.dart';
 import 'errors/view_error.dart';
 import 'pages/image_chat.dart';
 import 'pages/image_full_screen.dart';
@@ -12,6 +13,7 @@ import 'pages/saved_collection.dart';
 
 class Routes {
   static String splashPage = '/splash';
+  static String introductionPage = '/introduction';
   static String textChatsPage = '/text_chats';
   static String textChatPage = '/text_chat';
   static String settingsPage = '/settings';
@@ -27,6 +29,10 @@ final getPages = [
   GetPage(
     name: Routes.splashPage,
     page: () => const SplashPage(),
+  ),
+  GetPage(
+    name: Routes.introductionPage,
+    page: () => const Introduction(),
   ),
   GetPage(
     name: Routes.textChatsPage,
