@@ -48,12 +48,7 @@ class SettingsController extends GetxController {
             icon: const Icon(Icons.error), onTap: (_) {
           Get.toNamed(Routes.viewErrorPage, arguments: {'log': e.toString()});
         });
-        Get.toNamed(Routes.settingsPage);
       }
-    } else {
-      // redirect user to settings page
-      Get.snackbar("Alert!", "Please input api key to continue.");
-      Get.toNamed(Routes.settingsPage);
     }
   }
 
@@ -86,11 +81,13 @@ class SettingsController extends GetxController {
     }
   }
 
-  static Future<void> inAppUpdate() async {
+  static Future<void> inAppUpdate({bool showElse = false}) async {
     try {
       final updateInfo = await InAppUpdate.checkForUpdate();
       if (updateInfo.updateAvailability == UpdateAvailability.updateAvailable) {
         InAppUpdate.completeFlexibleUpdate();
+      } else if (showElse){
+        Get.snackbar("App on latest version!", "No updates available");
       }
     } catch (e) {
       Get.snackbar(
