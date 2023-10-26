@@ -93,7 +93,7 @@ class _IntroductionState extends State<Introduction> {
                     final url = Uri.parse(
                         'https://platform.openai.com/account/api-keys');
                     if (await canLaunchUrl(url)) {
-                      await launchUrl(url);
+                      await launchUrl(url,mode: LaunchMode.externalApplication);
                     } else {
                       throw 'Could not launch $url';
                     }
@@ -145,7 +145,7 @@ class _IntroductionState extends State<Introduction> {
                   onTap: () async {
                     final url = Uri.parse('https://platform.openai.com/login');
                     if (await canLaunchUrl(url)) {
-                      await launchUrl(url);
+                      await launchUrl(url,mode: LaunchMode.externalApplication);
                     } else {
                       throw 'Could not launch $url';
                     }
