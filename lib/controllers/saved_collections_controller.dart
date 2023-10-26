@@ -25,7 +25,7 @@ class SavedCollectionsController extends GetxController {
     Get.back();
     final SavedCollectionRoom collection = SavedCollectionRoom(
         id: id, name: name, createdOn: DateTime.now().toIso8601String());
-    Get.toNamed(Routes.textChatPage, arguments: collection.toMap());
+    Get.toNamed(Routes.savedCollectionPage, arguments: collection.toMap());
     await getChatRooms();
   }
 
