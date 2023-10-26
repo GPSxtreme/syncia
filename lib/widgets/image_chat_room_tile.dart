@@ -3,12 +3,45 @@ import 'package:intl/intl.dart';
 import 'package:get/get.dart';
 import 'package:syncia/controllers/image_chats_controller.dart';
 import 'package:syncia/models/image_chat_room_data.dart';
+import 'package:syncia/widgets/common_widgets.dart';
 
 import '../route.dart';
 
 class ImageChatRoomTile extends StatelessWidget {
   const ImageChatRoomTile({super.key, required this.chatRoomData});
   final ImageChatRoomData chatRoomData;
+
+  _showModalBottomSheet(BuildContext context) => showModalBottomSheet(
+      showDragHandle: true,
+      context: context,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 30),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                onTap: () async {
+                  bool? response = await CommonWidgets.commonAlertDialog(
+                      context,
+                      title: 'Delete room?',
+                      body: 'This action is irreversible',
+                      agreeLabel: "Yes",
+                      denyLabel: "No");
+                  if (response == true) {
+                    await ImageChatsController.to
+                        .deleteChatRoom(chatRoomData.id);
+                  }
+                  Get.back();
+                },
+                leading: const Icon(Icons.delete),
+                title: const Text('Delete room'),
+              )
+            ],
+          ),
+        );
+      });
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -27,15 +60,9 @@ class ImageChatRoomTile extends StatelessWidget {
           style: const TextStyle(fontSize: 15),
         ),
       ),
-      trailing: IconButton(
-        onPressed: () async {
-          await ImageChatsController.to.deleteChatRoom(chatRoomData.id);
-        },
-        icon: const Icon(
-          Icons.delete,
-          size: 30,
-        ),
-      ),
+      onLongPress: () {
+        _showModalBottomSheet(context);
+      },
     );
   }
 }
