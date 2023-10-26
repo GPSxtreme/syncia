@@ -32,6 +32,8 @@ class _SplashPageState extends State<SplashPage> {
       Future.delayed(const Duration(seconds: 2), () async {
         if (SettingsController.to.apiKeyController.text.isNotEmpty) {
           Get.offAndToNamed(Routes.textChatsPage);
+        } else {
+          Get.offAndToNamed(Routes.introductionPage);
         }
       });
     });
