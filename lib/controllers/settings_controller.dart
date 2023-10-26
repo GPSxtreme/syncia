@@ -55,7 +55,7 @@ class SettingsController extends GetxController {
   Future<void> saveApiKey() async {
     try {
       if (apiKeyController.text.isNotEmpty ||
-          apiKeyController.text.length < 10) {
+          apiKeyController.text.length > 10) {
         String apiKey = apiKeyController.text;
         await _storage.write(key: 'OPEN_AI_API_KEY', value: apiKey);
         OpenAI.apiKey = apiKey;
@@ -66,8 +66,9 @@ class SettingsController extends GetxController {
         Get.snackbar("Error", "Api key not valid",
             icon: const Icon(Icons.error));
         String? apiKey = await _storage.read(key: 'OPEN_AI_API_KEY');
-        if(apiKey != null){
+        if (apiKey != null) {
           apiKeyController.text = apiKey;
+          update();
         }
       }
     } catch (e) {
