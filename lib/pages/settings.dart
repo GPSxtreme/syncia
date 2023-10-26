@@ -1,5 +1,5 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:syncia/controllers/settings_controller.dart';
@@ -37,45 +37,53 @@ class _SettingsPageState extends State<SettingsPage> {
                       const SizedBox(
                         height: 20,
                       ),
-                      ListTile(
-                        title: const Text(
-                          "Open AI",
-                          style: TextStyle(fontSize: 20),
-                        ),
-                        subtitle: Column(
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            const Text(
+                              "Open AI",
+                              style: TextStyle(fontSize: 20),
+                            ),
+                            const SizedBox(
+                              height: 5,
+                            ),
                             const SizedBox(
                               height: 10,
                             ),
-                            Obx(
-                              () => RichText(
-                                text: TextSpan(
-                                  children: <TextSpan>[
-                                    TextSpan(
-                                        style: TextStyle(
-                                            color: ThemeController
-                                                    .to.isDarkTheme.value
-                                                ? Colors.white
-                                                : Colors.black),
-                                        text:
-                                            'You can get the api key from this link\n'),
-                                    TextSpan(
-                                        text:
-                                            'https://platform.openai.com/account/api-keys',
-                                        style:
-                                            const TextStyle(color: Colors.blue),
-                                        recognizer: TapGestureRecognizer()
-                                          ..onTap = () async {
-                                            final url = Uri.parse(
-                                                'https://platform.openai.com/account/api-keys');
-                                            if (await canLaunchUrl(url)) {
-                                              await launchUrl(url);
-                                            } else {
-                                              throw 'Could not launch $url';
-                                            }
-                                          }),
-                                  ],
+                            const Text(
+                              'You can get the api key from this link',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            Tooltip(
+                              message: 'Click here to get api key',
+                              child: GestureDetector(
+                                onLongPress: () {
+                                  // copy link to clipboard
+                                  Clipboard.setData(const ClipboardData(
+                                      text:
+                                          'https://platform.openai.com/account/api-keys'));
+                                },
+                                onTap: () async {
+                                  final url = Uri.parse(
+                                      'https://platform.openai.com/account/api-keys');
+                                  if (await canLaunchUrl(url)) {
+                                    await launchUrl(url);
+                                  } else {
+                                    throw 'Could not launch $url';
+                                  }
+                                },
+                                child: const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 5),
+                                  child: Text(
+                                    'https://platform.openai.com/account/api-keys',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.blue,
+                                        decoration: TextDecoration.underline,
+                                        decorationColor: Colors.blue),
+                                  ),
                                 ),
                               ),
                             ),
