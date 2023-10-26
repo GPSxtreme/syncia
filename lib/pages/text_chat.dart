@@ -60,12 +60,10 @@ class _TextChatPageState extends State<TextChatPage> {
                       ),
                     )
                   : controller.chatMessages.isEmpty && controller.initialized
-                      ? Positioned(
-                          top: 0,
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
+                      ? Align(
+                          alignment: Alignment.center,
                           child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Center(
                                   child: Image.asset(
