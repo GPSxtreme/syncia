@@ -23,7 +23,7 @@ class ImageChatsController extends GetxController {
   Future<void> createImageChatRoom(String roomName) async {
     final newRoom = await databaseService.createImageChatRoom(roomName);
     Get.back();
-    Get.toNamed(Routes.imageChatsPage, arguments: newRoom.toJson());
+    Get.toNamed(Routes.imageChatPage, arguments: newRoom.toJson());
     await getChatRooms();
   }
 
