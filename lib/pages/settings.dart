@@ -236,7 +236,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
                         leading: const Icon(Icons.update),
                         onTap: () async {
-                          await SettingsController.inAppUpdate();
+                          await SettingsController.inAppUpdate(showElse: true);
                         },
                       ),
                     ],
