@@ -69,5 +69,5 @@ Contributions are welcomed! Please feel free to fork the repository, make your c
 
 ## License
 
-This project is open-source, available under the MIT License. See [LICENSE.md](LICENSE.md) for more details.
+This project is open-source, available under the MIT License. See [LICENSE.md](LICENSE) for more details.
 
