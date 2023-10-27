@@ -1,6 +1,8 @@
 # syncia ✨
 Open-source, effortless chatting with OpenAI models. Fast and efficient.
 
+[Available on Google play store!](https://play.google.com/store/apps/details?id=com.gpsxtreme.syncia)
+
 ![syncia](https://github.com/GPSxtreme/syncia/assets/86603322/1c1991fa-507f-4204-916a-3107432fb964)
 
 ## Table of Contents
