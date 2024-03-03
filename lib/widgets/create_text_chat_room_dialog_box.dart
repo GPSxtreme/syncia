@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:syncia/controllers/chats_controller.dart';
 import 'package:syncia/controllers/theme_controller.dart';
 import 'package:syncia/services/open_ai_service.dart';
 import 'package:syncia/styles/size_config.dart';
 import 'package:get/get.dart';
 
-import '../controllers/chats_controller.dart';
-
 class CreateTextChatRoomDialogBox extends StatelessWidget {
   CreateTextChatRoomDialogBox({super.key});
   final TextEditingController _nameController = TextEditingController();
-  final List<String> availableModels =
-      OpenAiService.models.map((e) => e.id).toList();
+  // map all the ids of elements in the OpenAiService.models staring with gpt
+  final List<String> availableModels = OpenAiService.models
+      .map((e) => e.id)
+      .where((e) => e.startsWith('gpt'))
+      .toList();
   final selectedModel = 'gpt-3.5-turbo'.obs;
 
   @override

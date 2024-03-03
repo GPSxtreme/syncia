@@ -6,14 +6,14 @@ import 'package:sembast/sembast_io.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncia/errors/exception_message.dart';
+import 'package:syncia/models/chat_message.dart';
+import 'package:syncia/models/chat_room_data.dart';
+import 'package:syncia/models/chat_room_messages.dart';
 import 'package:syncia/models/image_chat_room_data.dart';
 import 'package:syncia/models/image_chat_room_messages.dart';
 import 'package:syncia/models/image_room_message.dart';
+import 'package:syncia/models/saved_collection_messages.dart';
 import 'package:syncia/models/saved_collection_room.dart';
-import '../models/chat_message.dart';
-import '../models/chat_room_data.dart';
-import '../models/chat_room_messages.dart';
-import '../models/saved_collection_messages.dart';
 
 enum ThemeSetting { light, dark, systemDefault }
 
@@ -31,12 +31,36 @@ class DatabaseService {
   Database? _database;
 
   Future<Database> get database async {
-    final status = await Permission.storage.status;
-    if (status.isDenied || status.isRestricted) {
-      await Permission.storage.request();
+    // Helper function to open or return the database.
+    Future<Database> _openDatabase() async {
+      return _database ??= await _databaseFactory.openDatabase(
+          '${(await getApplicationDocumentsDirectory()).path}/$dbName');
     }
-    return _database ??= await _databaseFactory.openDatabase(
-        '${(await getApplicationDocumentsDirectory()).path}/$dbName');
+
+    // Check the current status of the storage permission.
+    final status = await Permission.storage.status;
+
+    // If the permission is already granted, open the database directly.
+    if (status.isGranted) {
+      return _openDatabase();
+    }
+
+    // If the permission is denied or restricted, request it again.
+    if (status.isDenied || status.isRestricted) {
+      final requestResult = await Permission.storage.request();
+
+      // If the permission is granted upon request, open the database.
+      if (requestResult.isGranted) {
+        return _openDatabase();
+      }
+    }
+
+    // If we reach this point, it means the permission was neither initially granted
+    // nor granted after requesting. You might want to handle this case explicitly,
+    // e.g., by throwing an exception or returning a null or a default database instance.
+    // For the sake of example, I'll throw an exception.
+    throw Exception(
+        'Storage permission not granted. Cannot access the database.');
   }
 
   StoreRef<int, Map<String, dynamic>> _store(String name) =>
