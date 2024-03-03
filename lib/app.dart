@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'controllers/theme_controller.dart';
+import 'package:syncia/controllers/theme_controller.dart';
 import 'route.dart';
 
 class MyApp extends StatelessWidget {
