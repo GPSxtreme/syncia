@@ -2,10 +2,10 @@
 import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import '../models/chat_message.dart';
+import 'package:syncia/models/chat_message.dart';
+import 'package:syncia/services/local_database_service.dart';
+import 'package:syncia/services/open_ai_service.dart';
 import '../route.dart';
-import '../services/local_database_service.dart';
-import '../services/open_ai_service.dart';
 import 'package:flutter/material.dart';
 
 const int MAX_CHAR = 10000;
@@ -110,93 +110,123 @@ class ChatController extends GetxController {
     chatMessages.add(message);
   }
 
+  // Sends a chat message asynchronously.
   Future<void> sendChatMessage() async {
-    if (inputController.text.isEmpty) {
+    final messageText = inputController.text.trim();
+    if (messageText.isEmpty) {
       return;
     }
 
-    isSendingMessage.value = true;
-    final question = inputController.text;
-
-    var currentChatHistory = chatMessages
-        .expand((message) => [
-              OpenAIChatCompletionChoiceMessageModel(
-                content: message.query,
-                role: OpenAIChatMessageRole.user,
-              ),
-              if (message.response.isNotEmpty)
-                OpenAIChatCompletionChoiceMessageModel(
-                  content: message.response,
-                  role: OpenAIChatMessageRole.system,
-                ),
-            ])
-        .toList();
+    _startMessageSending();
 
     try {
-      final stream = await OpenAiService.streamChatCompletionWithHistory(
-          question.trim(), modelId, currentChatHistory);
+      final currentChatHistory = _buildChatHistory();
+      final responseStream =
+          await OpenAiService.streamChatCompletionWithHistory(
+        messageText,
+        modelId,
+        currentChatHistory,
+      );
 
-      StringBuffer streamedResponse = StringBuffer();
-
-      if (stream != null) {
-        String? id;
-        inputController.clear();
-        stream.listen((response) {
-          id = response.id;
-          streamedResponse.write(response.choices.first.delta.content!);
-
-          ChatMessage message = ChatMessage(
-            id: id!,
-            query: question.trim(),
-            response: streamedResponse.toString(),
-            timestamp: DateTime.now(),
-          );
-
-          addOrUpdateMessage(message);
-          scrollToBottom(addDelay: true, delay: 250);
-        }, onDone: () {
-          if (id != null) {
-            ChatMessage finalMessage = ChatMessage(
-              id: id!,
-              query: question.trim(),
-              response: streamedResponse.toString(),
-              timestamp: DateTime.now(),
-            );
-            databaseService.saveChatMessage(roomId, finalMessage);
-            scrollToBottom();
-          }
-          isSendingMessage.value = false;
-        }, onError: (error) {
-          Get.snackbar('Error', 'Failed to process request.',
-              icon: const Icon(Icons.error), onTap: (_) {
-            Get.toNamed(Routes.viewErrorPage,
-                arguments: {'log': error.toString()});
-          });
-          isSendingMessage.value = false;
-        });
+      if (responseStream != null) {
+        await _processResponseStream(responseStream, messageText);
       } else {
-        Get.snackbar(
-          'Error',
-          'Failed to process request.',
-          icon: const Icon(Icons.error),
-        );
+        _showErrorSnackbar('Failed to process request.');
       }
     } catch (error) {
-      Get.snackbar(
-          'Error', 'Failed to process request.\nClick here to view full log',
-          icon: const Icon(Icons.error), onTap: (_) {
-        if (error is MissingApiKeyException) {
-          Get.toNamed(Routes.viewErrorPage, arguments: {
-            'log':
-                'API key is not set\nplease go to settings and input open ai key.'
-          });
-        } else {
-          Get.toNamed(Routes.viewErrorPage,
-              arguments: {'log': error.toString()});
-        }
-      });
+      _handleSendError(error);
+    } finally {
       isSendingMessage.value = false;
     }
+  }
+
+  void _updateChatUI(String question, String response, String id) {
+    final message = ChatMessage(
+        id: id, query: question, response: response, timestamp: DateTime.now());
+    addOrUpdateMessage(message);
+    scrollToBottom(addDelay: true, delay: 250);
+  }
+
+  // Processes the stream of OpenAIStreamChatCompletionModel responses.
+  Future<void> _processResponseStream(
+      Stream<OpenAIStreamChatCompletionModel>? stream, String question) async {
+    if (stream == null) {
+      _showErrorSnackbar('No response stream available.');
+      return;
+    }
+
+    String? messageId;
+    final StringBuffer streamedResponse = StringBuffer();
+
+    await for (final OpenAIStreamChatCompletionModel response in stream) {
+      messageId = response
+          .id; // Assuming 'id' exists in OpenAIStreamChatCompletionModel
+      // Process each piece of content in the response's choices. This assumes a similar structure to what was initially expected.
+      response.choices.first.delta.content?.forEach((element) {
+        streamedResponse.write(
+            element?.text ?? ''); // Safely handle null 'element' and 'text'
+      });
+
+      _updateChatUI(question, streamedResponse.toString(), messageId);
+    }
+
+    if (messageId != null) {
+      final ChatMessage finalMessage = ChatMessage(
+        id: messageId,
+        query: question,
+        response: streamedResponse.toString(),
+        timestamp: DateTime.now(),
+      );
+      databaseService.saveChatMessage(roomId, finalMessage);
+      scrollToBottom();
+    }
+  }
+
+// Starts sending a message by setting the appropriate flags and clearing the input controller.
+  void _startMessageSending() {
+    isSendingMessage.value = true;
+    inputController.clear();
+  }
+
+// Builds the chat history from the current chat messages to be used for the chat completion request.
+  List<OpenAIChatCompletionChoiceMessageModel> _buildChatHistory() {
+    return chatMessages.expand((message) {
+      final userMessage = OpenAIChatCompletionChoiceMessageModel(
+        content: [
+          OpenAIChatCompletionChoiceMessageContentItemModel.text(message.query)
+        ],
+        role: OpenAIChatMessageRole.user,
+      );
+      final systemMessage = message.response.isNotEmpty
+          ? OpenAIChatCompletionChoiceMessageModel(
+              content: [
+                OpenAIChatCompletionChoiceMessageContentItemModel.text(
+                    message.query)
+              ],
+              role: OpenAIChatMessageRole.system,
+            )
+          : null;
+      return systemMessage != null
+          ? [userMessage, systemMessage]
+          : [userMessage];
+    }).toList();
+  }
+
+// Displays an error snackbar with the provided message.
+  void _showErrorSnackbar(String message) {
+    Get.snackbar('Error', message, icon: const Icon(Icons.error));
+  }
+
+// Handles errors during the message sending process.
+  void _handleSendError(dynamic error) {
+    final errorMessage = error is MissingApiKeyException
+        ? 'API key is not set. Please go to settings and input OpenAI key.'
+        : error.toString();
+    Get.snackbar(
+        'Error', 'Failed to process request.\nClick here to view full log',
+        icon: const Icon(Icons.error), onTap: (_) {
+      Get.toNamed(Routes.viewErrorPage, arguments: {'log': errorMessage});
+    });
   }
 
   void addOrUpdateMessage(ChatMessage message) {
