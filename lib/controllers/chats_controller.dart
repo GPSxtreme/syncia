@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
+import 'package:syncia/models/chat_room_data.dart';
 import 'package:syncia/services/local_database_service.dart';
-import '../models/chat_room_data.dart';
+
 import '../route.dart';
 
 class ChatsController extends GetxController {
@@ -15,8 +16,10 @@ class ChatsController extends GetxController {
   }
 
   Future<void> getChatRooms() async {
-    chatRooms = await databaseService.getChatRooms();
-    update();
+    await databaseService.getChatRooms().then((value) {
+      chatRooms = value;
+      update();
+    });
   }
 
   Future<void> createTextChatRoom(String roomName, String modelName) async {
