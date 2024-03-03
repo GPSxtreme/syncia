@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncia/controllers/image_chats_controller.dart';
+import 'package:syncia/controllers/theme_controller.dart';
 import 'package:syncia/widgets/app_drawer.dart';
 import 'package:syncia/widgets/create_image_chat_room_dialog_box.dart';
 import 'package:syncia/widgets/image_chat_room_tile.dart';
-import '../controllers/theme_controller.dart';
 
 class ImageChatsPage extends StatelessWidget {
   const ImageChatsPage({super.key});

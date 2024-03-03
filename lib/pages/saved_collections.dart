@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:syncia/controllers/saved_collections_controller.dart';
+import 'package:syncia/controllers/theme_controller.dart';
 import 'package:syncia/widgets/app_drawer.dart';
 import 'package:get/get.dart';
 import 'package:syncia/widgets/create_collection_dialog_box.dart';
 import 'package:syncia/widgets/saved_collection_tile.dart';
-import '../controllers/theme_controller.dart';
 
 class SavedCollectionsPage extends StatelessWidget {
   const SavedCollectionsPage({super.key});

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:syncia/controllers/chats_controller.dart';
 import 'package:syncia/controllers/image_chats_controller.dart';
+import 'package:syncia/controllers/saved_collections_controller.dart';
+import 'package:syncia/controllers/settings_controller.dart';
+import 'package:syncia/route.dart';
 import 'package:syncia/styles/app_styles.dart';
-import '../controllers/chats_controller.dart';
-import '../controllers/saved_collections_controller.dart';
-import '../controllers/settings_controller.dart';
-import '../route.dart';
-import '../styles/size_config.dart';
+import 'package:syncia/styles/size_config.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});

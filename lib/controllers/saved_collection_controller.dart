@@ -1,8 +1,8 @@
 // ignore_for_file: constant_identifier_names, non_constant_identifier_names
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../models/chat_message.dart';
-import '../services/local_database_service.dart';
+import 'package:syncia/models/chat_message.dart';
+import 'package:syncia/services/local_database_service.dart';
 
 const int INITIAL_MESSAGE_LOAD_COUNT = 10;
 const int OLD_MESSAGES_FETCH_COUNT = 5;

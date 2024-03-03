@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncia/controllers/chats_controller.dart';
+import 'package:syncia/controllers/theme_controller.dart';
 import 'package:syncia/widgets/app_drawer.dart';
 import 'package:syncia/widgets/create_text_chat_room_dialog_box.dart';
-import '../controllers/theme_controller.dart';
 import '../widgets/text_chat_room_tile.dart';
 
 class TextChatsPage extends StatefulWidget {

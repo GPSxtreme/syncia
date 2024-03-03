@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/image_chat_controller.dart';
+import 'package:syncia/controllers/image_chat_controller.dart';
 import '../models/image_room_message.dart';
 import '../styles/size_config.dart';
 
