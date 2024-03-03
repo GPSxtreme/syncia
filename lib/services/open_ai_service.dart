@@ -49,7 +49,9 @@ class OpenAiService {
       // Add the new user message to the provided chat history
       currentChatHistory.add(
         OpenAIChatCompletionChoiceMessageModel(
-          content: content,
+          content: <OpenAIChatCompletionChoiceMessageContentItemModel>[
+            OpenAIChatCompletionChoiceMessageContentItemModel.text(content)
+          ],
           role: OpenAIChatMessageRole.user,
         ),
       );
@@ -76,7 +78,9 @@ class OpenAiService {
       model: model,
       messages: [
         OpenAIChatCompletionChoiceMessageModel(
-          content: content,
+          content: <OpenAIChatCompletionChoiceMessageContentItemModel>[
+            OpenAIChatCompletionChoiceMessageContentItemModel.text(content)
+          ],
           role: OpenAIChatMessageRole.user,
         ),
       ],
@@ -88,7 +92,9 @@ class OpenAiService {
       String prompt, String model) async {
     return OpenAI.instance.chat.createStream(model: model, messages: [
       OpenAIChatCompletionChoiceMessageModel(
-        content: prompt,
+        content: <OpenAIChatCompletionChoiceMessageContentItemModel>[
+          OpenAIChatCompletionChoiceMessageContentItemModel.text(prompt)
+        ],
         role: OpenAIChatMessageRole.user,
       )
     ]);
@@ -105,7 +111,9 @@ class OpenAiService {
       // Add the new user message to the provided chat history
       currentChatHistory.add(
         OpenAIChatCompletionChoiceMessageModel(
-          content: prompt,
+          content: <OpenAIChatCompletionChoiceMessageContentItemModel>[
+            OpenAIChatCompletionChoiceMessageContentItemModel.text(prompt)
+          ],
           role: OpenAIChatMessageRole.user,
         ),
       );
