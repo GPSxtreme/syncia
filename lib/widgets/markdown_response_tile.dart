@@ -9,8 +9,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:markdown/markdown.dart' as md;
-
-import '../controllers/theme_controller.dart';
+import 'package:syncia/controllers/theme_controller.dart';
 
 class MarkdownResponseTile extends StatelessWidget {
   final String response;

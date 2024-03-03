@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncia/controllers/image_chats_controller.dart';
-import '../controllers/theme_controller.dart';
+import 'package:syncia/controllers/theme_controller.dart';
 import '../styles/size_config.dart';
 
 class CreateImageChatRoomDialogBox extends StatelessWidget {

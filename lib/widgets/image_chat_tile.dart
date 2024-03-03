@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:syncia/controllers/image_chat_controller.dart';
+import 'package:syncia/controllers/theme_controller.dart';
 import 'package:syncia/models/image_room_message.dart';
 import 'package:get/get.dart';
 
-import '../controllers/theme_controller.dart';
 import '../route.dart';
 import '../styles/size_config.dart';
 
