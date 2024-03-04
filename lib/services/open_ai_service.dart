@@ -1,5 +1,6 @@
 import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter/foundation.dart';
+import 'package:syncia/controllers/settings_controller.dart';
 import 'package:syncia/errors/exception_message.dart';
 
 class OpenAiService {
@@ -7,6 +8,8 @@ class OpenAiService {
 
   static Future<void> init() async {
     models = await OpenAI.instance.model.list();
+    //update in settings controller
+    SettingsController.to.updateModels(models);
   }
 
   /// Returns the model with the given id
