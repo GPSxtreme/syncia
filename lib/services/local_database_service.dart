@@ -31,6 +31,7 @@ class DatabaseService {
   Database? _database;
 
   Future<Database> get database async {
+    print("called");
     // Helper function to open or return the database.
     Future<Database> _openDatabase() async {
       return _database ??= await _databaseFactory.openDatabase(
@@ -47,7 +48,8 @@ class DatabaseService {
 
     // If the permission is denied or restricted, request it again.
     if (status.isDenied || status.isRestricted) {
-      final requestResult = await Permission.storage.request();
+      final requestResult = await Permission.manageExternalStorage.request();
+      await Permission.mediaLibrary.request();
 
       // If the permission is granted upon request, open the database.
       if (requestResult.isGranted) {
