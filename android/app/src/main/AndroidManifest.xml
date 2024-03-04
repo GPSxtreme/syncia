@@ -5,8 +5,9 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
         <!-- Permissions options for the `microphone` or `speech` group -->
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="MANAGE_EXTERNAL_STORAGE" />
     <!-- Provide required visibility configuration for API level 30 and above -->
     <queries>
         <!-- If your application checks for inAppBrowserView launch mode support -->
