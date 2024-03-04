@@ -114,7 +114,7 @@ class SettingsController extends GetxController {
     try {
       final updateInfo = await InAppUpdate.checkForUpdate();
       if (updateInfo.updateAvailability == UpdateAvailability.updateAvailable) {
-        InAppUpdate.completeFlexibleUpdate();
+        InAppUpdate.performImmediateUpdate();
       } else if (showElse) {
         Get.snackbar("App on latest version!", "No updates available");
       }
