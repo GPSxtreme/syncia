@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncia/controllers/chats_controller.dart';
+import 'package:syncia/controllers/settings_controller.dart';
 import 'package:syncia/controllers/theme_controller.dart';
 import 'package:syncia/widgets/app_drawer.dart';
 import 'package:syncia/widgets/create_text_chat_room_dialog_box.dart';
@@ -23,21 +24,23 @@ class _TextChatsPageState extends State<TextChatsPage> {
         title: const Text('All chats'),
         elevation: 0.5,
       ),
-      floatingActionButton: FloatingActionButton(
-          child: Obx(() => Icon(
-                Icons.add,
-                color: ThemeController.to.isDarkTheme.value
-                    ? Colors.blue
-                    : Colors.white,
-                size: 40,
-              )),
-          onPressed: () => showDialog(
-                context: context,
-                barrierDismissible: true,
-                builder: (context) {
-                  return CreateTextChatRoomDialogBox();
-                },
-              )),
+      floatingActionButton: SettingsController.to.models.isNotEmpty
+          ? FloatingActionButton(
+              child: Obx(() => Icon(
+                    Icons.add,
+                    color: ThemeController.to.isDarkTheme.value
+                        ? Colors.blue
+                        : Colors.white,
+                    size: 40,
+                  )),
+              onPressed: () => showDialog(
+                    context: context,
+                    barrierDismissible: true,
+                    builder: (context) {
+                      return CreateTextChatRoomDialogBox();
+                    },
+                  ))
+          : null,
       body: GetBuilder<ChatsController>(
         assignId: true,
         autoRemove: false,
@@ -53,9 +56,11 @@ class _TextChatsPageState extends State<TextChatsPage> {
               },
             );
           } else if (controller.chatRooms.isEmpty && controller.initialized) {
-            return const Center(
+            return Center(
               child: Text(
-                'No chats available\nCreate new chat by pressing add icon below',
+                SettingsController.to.models.isEmpty
+                    ? "Error loading models!\nPlease check your api key/internet and try again."
+                    : 'No chats available\nCreate new chat by pressing add icon below',
                 style: TextStyle(fontSize: 15),
                 textAlign: TextAlign.center,
               ),
