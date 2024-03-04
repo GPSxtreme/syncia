@@ -61,8 +61,12 @@ class CreateTextChatRoomDialogBox extends StatelessWidget {
                   onPressed: () async {
                     if (_nameController.text.isNotEmpty &&
                         selectedModel.isNotEmpty) {
-                      await ChatsController.to.createTextChatRoom(
-                          _nameController.text.trim(), selectedModel.value);
+                      try {
+                        await ChatsController.to.createTextChatRoom(
+                            _nameController.text.trim(), selectedModel.value);
+                      } catch (e) {
+                        Get.snackbar('Error', e.toString());
+                      }
                     } else {
                       Get.snackbar('Error', 'Room name cannot be empty!');
                     }
