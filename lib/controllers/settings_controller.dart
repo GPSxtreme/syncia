@@ -14,6 +14,7 @@ class SettingsController extends GetxController {
   final apiKeyController = TextEditingController();
   final RxString version = RxString('');
   final RxString buildVersion = RxString('');
+  final RxList<OpenAIModelModel> models = <OpenAIModelModel>[].obs;
 
   @override
   void onInit() async {
@@ -26,6 +27,11 @@ class SettingsController extends GetxController {
   void dispose() {
     apiKeyController.dispose();
     super.dispose();
+  }
+
+  Future<void> updateModels(List<OpenAIModelModel> models) {
+    this.models.value = models;
+    return Future.value();
   }
 
   Future<void> _getAppVersionData() async {
