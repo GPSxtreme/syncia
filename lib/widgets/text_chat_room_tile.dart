@@ -13,6 +13,7 @@ class TextChatRoomTile extends StatelessWidget {
   _showModalBottomSheet(BuildContext context) => showModalBottomSheet(
       showDragHandle: true,
       context: context,
+      backgroundColor: Theme.of(context).colorScheme.secondary,
       builder: (context) {
         return Padding(
           padding: const EdgeInsets.only(bottom: 30),
@@ -54,7 +55,7 @@ class TextChatRoomTile extends StatelessWidget {
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 3),
           child: Text(
-            'Created on : ${DateFormat('d MMMM, h:mm a').format(DateTime.parse(chatRoomData.createdOn).toLocal())}',
+            'Created on: ${DateFormat('h:mm a, d MMM yy').format(DateTime.parse(chatRoomData.createdOn).toLocal())}',
             style: const TextStyle(fontSize: 15),
           ),
         ),
