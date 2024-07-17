@@ -28,13 +28,13 @@ class DatabaseService {
       'saved_collection_rooms';
   static const String savedMessagesDataStoreName = 'saved_messages';
 
-  final DatabaseFactory _databaseFactory = databaseFactoryIo;
   Database? _database;
 
   Future<Database> get database async {
     Directory root = await getTemporaryDirectory();
 
-    return _database ??= await dbFactory.openDatabase(root.path + dbName);}
+    return _database ??= await dbFactory.openDatabase(root.path + dbName);
+  }
 
   StoreRef<int, Map<String, dynamic>> _store(String name) =>
       intMapStoreFactory.store(name);
