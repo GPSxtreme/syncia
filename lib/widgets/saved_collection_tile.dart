@@ -55,7 +55,7 @@ class SavedCollectionTile extends StatelessWidget {
       subtitle: Padding(
         padding: const EdgeInsets.only(top: 3),
         child: Text(
-          'Created on : ${DateFormat('d MMMM, h:mm a').format(DateTime.parse(collection.createdOn).toLocal())}',
+          'Created on: ${DateFormat('h:mm a, d MMM yy').format(DateTime.parse(collection.createdOn).toLocal())}',
           style: const TextStyle(fontSize: 15),
         ),
       ),
