@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:syncia/controllers/saved_collections_controller.dart';
-import 'package:syncia/controllers/theme_controller.dart';
 import 'package:syncia/widgets/app_drawer.dart';
 import 'package:get/get.dart';
 import 'package:syncia/widgets/create_collection_dialog_box.dart';
@@ -15,17 +14,17 @@ class SavedCollectionsPage extends StatelessWidget {
       drawer: const AppDrawer(),
       appBar: AppBar(
         centerTitle: true,
-        title: const Text('Saved'),
+        title: Text(
+          'Saved',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
         elevation: 0.5,
       ),
       floatingActionButton: FloatingActionButton(
-          child: Obx(() => Icon(
-                Icons.add,
-                color: ThemeController.to.isDarkTheme.value
-                    ? Colors.blue
-                    : Colors.white,
-                size: 40,
-              )),
+          child: const Icon(
+            Icons.add,
+            size: 40,
+          ),
           onPressed: () => showDialog(
                 context: context,
                 barrierDismissible: true,
@@ -47,12 +46,34 @@ class SavedCollectionsPage extends StatelessWidget {
               },
             );
           } else if (controller.collections.isEmpty && controller.initialized) {
-            return const Center(
-              child: Text(
-                'No saved collections available\nCreate new collection by pressing add icon below',
-                style: TextStyle(fontSize: 15),
-                textAlign: TextAlign.center,
-              ),
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Center(
+                  child: Material(
+                    shape: const CircleBorder(),
+                    color: Theme.of(context).colorScheme.secondary,
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Icon(
+                        Icons.close,
+                        color: Theme.of(context).colorScheme.surfaceDim,
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  child: Text(
+                    "No saved collections. Create one by clicking the + button.",
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                        color: Theme.of(context).colorScheme.surfaceDim),
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              ],
             );
           } else {
             return const Center(
