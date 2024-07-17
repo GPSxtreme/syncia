@@ -7,7 +7,7 @@ import 'package:flutter_svg/svg.dart';
 import '../styles/size_config.dart';
 
 class AppDrawer extends StatelessWidget {
-  const AppDrawer({Key? key}) : super(key: key);
+  const AppDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +42,8 @@ class AppDrawer extends StatelessWidget {
                   SizedBox(
                     height: SizeConfig.blockSizeVertical! * 2,
                   ),
-                  Divider(
-                    thickness: 2,
-                    color: Colors.grey[300],
+                  const Divider(
+                    thickness: 1,
                   )
                 ],
               ),
@@ -85,18 +84,16 @@ class AppDrawer extends StatelessWidget {
                     : Get.back();
               },
             ),
-            Obx(() => ListTile(
-                  leading: ThemeController.to.isDarkTheme.value
+            Obx(() => SwitchListTile(
+                  secondary: ThemeController.to.isDarkTheme.value
                       ? const Icon(Icons.nightlight)
                       : const Icon(Icons.sunny),
                   title: Text(ThemeController.to.isDarkTheme.value
                       ? 'Dark mode'
                       : 'Light mode'),
-                  trailing: Obx(() => Switch(
-                        value: Get.find<ThemeController>().isDarkTheme.value,
-                        onChanged: (value) =>
-                            Get.find<ThemeController>().toggleTheme(),
-                      )),
+                  value: Get.find<ThemeController>().isDarkTheme.value,
+                  onChanged: (value) =>
+                      Get.find<ThemeController>().toggleTheme(),
                 )),
           ],
         ),
