@@ -92,22 +92,15 @@ class _SettingsPageState extends State<SettingsPage> {
                             ),
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8.0),
-                              child: Obx(
-                                () => TextField(
-                                    controller: controller.apiKeyController,
-                                    onSubmitted: (_) async {
-                                      await controller.saveApiKey();
-                                    },
-                                    decoration: InputDecoration(
-                                      filled: true,
-                                      fillColor:
-                                          ThemeController.to.isDarkTheme.value
-                                              ? Colors.white24
-                                              : Colors.black12,
-                                      hintText: "Please input api key",
-                                      border: InputBorder.none,
-                                    )),
-                              ),
+                              child: TextField(
+                                  controller: controller.apiKeyController,
+                                  onSubmitted: (_) async {
+                                    await controller.saveApiKey();
+                                  },
+                                  decoration: const InputDecoration(
+                                    filled: true,
+                                    hintText: "Please input api key",
+                                  )),
                             ),
                           ],
                         ),
