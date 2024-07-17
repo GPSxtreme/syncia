@@ -16,6 +16,7 @@ class QueryTile extends StatelessWidget {
   _showModalBottomSheet(BuildContext context) => showModalBottomSheet(
       context: context,
       showDragHandle: true,
+      backgroundColor: Theme.of(context).colorScheme.secondary,
       builder: (context) {
         return GetBuilder<SavedCollectionsController>(
             init: SavedCollectionsController(),
