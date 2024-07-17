@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:syncia/controllers/chats_controller.dart';
-import 'package:syncia/controllers/theme_controller.dart';
 import 'package:syncia/services/open_ai_service.dart';
 import 'package:syncia/styles/size_config.dart';
 import 'package:get/get.dart';
@@ -82,24 +81,11 @@ class CreateTextChatRoomDialogBox extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Obx(
-                () => TextField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 15),
-                        labelText: 'Room Name',
-                        labelStyle: const TextStyle(fontSize: 14),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: ThemeController.to.isDarkTheme.value
-                                    ? Colors.white24
-                                    : Colors.black26)),
-                        border: const OutlineInputBorder(
-                            borderSide: BorderSide(
-                          width: 1,
-                        )))),
-              ),
+              TextField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    hintText: 'Room name',
+                  )),
               const SizedBox(height: 20),
               const Text('Choose model'),
               const SizedBox(height: 10),
