@@ -168,7 +168,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         subtitle: const Text('Made with ❤️ by prudhvi suraaj'),
                         leading: const Icon(Icons.logo_dev_rounded),
                         onTap: () {
-                          controller.launchLink("https://prudhvisuraaj.me/");
+                          controller.launchLink("https://gpsxtre.me/");
                         },
                       ),
                       ListTile(
