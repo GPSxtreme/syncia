@@ -60,7 +60,6 @@ class CommonWidgets {
               ),
               if (!isSingleBtn) ...[
                 Divider(
-                  color: Colors.grey,
                   indent: 40,
                   endIndent: 40,
                 ),
