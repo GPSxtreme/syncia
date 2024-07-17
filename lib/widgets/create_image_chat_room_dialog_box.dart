@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncia/controllers/image_chats_controller.dart';
-import 'package:syncia/controllers/theme_controller.dart';
 import '../styles/size_config.dart';
 
 class CreateImageChatRoomDialogBox extends StatelessWidget {
@@ -70,24 +69,11 @@ class CreateImageChatRoomDialogBox extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Obx(
-                () => TextField(
-                    controller: nameController,
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 15),
-                        labelText: 'room name',
-                        labelStyle: const TextStyle(fontSize: 14),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: ThemeController.to.isDarkTheme.value
-                                    ? Colors.white24
-                                    : Colors.black26)),
-                        border: const OutlineInputBorder(
-                            borderSide: BorderSide(
-                          width: 1,
-                        )))),
-              ),
+              TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(
+                    hintText: 'Room name',
+                  )),
             ]),
       ),
     );
