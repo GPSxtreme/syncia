@@ -4,15 +4,25 @@ import 'package:syncia/services/open_ai_service.dart';
 import 'package:syncia/styles/size_config.dart';
 import 'package:get/get.dart';
 
-class CreateTextChatRoomDialogBox extends StatelessWidget {
-  CreateTextChatRoomDialogBox({super.key});
+class CreateTextChatRoomDialogBox extends StatefulWidget {
+  const CreateTextChatRoomDialogBox({super.key});
+
+  @override
+  State<CreateTextChatRoomDialogBox> createState() =>
+      _CreateTextChatRoomDialogBoxState();
+}
+
+class _CreateTextChatRoomDialogBoxState
+    extends State<CreateTextChatRoomDialogBox> {
   final TextEditingController _nameController = TextEditingController();
+
   // map all the ids of elements in the OpenAiService.models staring with gpt
   final List<String> availableModels = OpenAiService.models
       .map((e) => e.id)
       .where((e) => e.startsWith('gpt'))
       .toList();
-  final selectedModel = 'gpt-3.5-turbo'.obs;
+
+  String selectedModel = 'gpt-3.5-turbo';
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +72,7 @@ class CreateTextChatRoomDialogBox extends StatelessWidget {
                         selectedModel.isNotEmpty) {
                       try {
                         await ChatsController.to.createTextChatRoom(
-                            _nameController.text.trim(), selectedModel.value);
+                            _nameController.text.trim(), selectedModel);
                       } catch (e) {
                         Get.snackbar('Error', e.toString());
                       }
@@ -89,9 +99,9 @@ class CreateTextChatRoomDialogBox extends StatelessWidget {
               const SizedBox(height: 20),
               const Text('Choose model'),
               const SizedBox(height: 10),
-              Obx(() => DropdownButton(
+              DropdownButton(
                   isExpanded: true,
-                  value: selectedModel.value,
+                  value: selectedModel,
                   menuMaxHeight: SizeConfig.blockSizeVertical! * 30,
                   items: availableModels
                       .map((e) => DropdownMenuItem(
@@ -103,8 +113,10 @@ class CreateTextChatRoomDialogBox extends StatelessWidget {
                           ))
                       .toList(),
                   onChanged: (value) {
-                    selectedModel.value = value.toString();
-                  }))
+                    setState(() {
+                      selectedModel = value.toString();
+                    });
+                  })
             ],
           ),
         ));
